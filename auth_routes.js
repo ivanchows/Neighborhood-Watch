@@ -11,7 +11,7 @@ import {
   checkAge,
   checkAddress,
   checkPassword
-} from '../data/users.js';
+} from './users.js';
 
 const router = Router();
 

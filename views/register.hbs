@@ -1,14 +1,107 @@
 <main>
   <section style="padding: 100px 0; min-height: 70vh;">
-    <div class="container" style="max-width: 520px;">
+    <div class="container" style="max-width: 560px;">
       <div class="section-eyebrow">// Get Started</div>
       <h2 class="section-title">Create your <em>account.</em></h2>
-      <p class="section-lede" style="margin-bottom: 32px;">
-        Implement registration form.
+      <p class="section-lede" style="margin-bottom: 40px;">
+        Join your neighborhood watch community.
       </p>
-      <p style="color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
-        File: views/register.hbs
+
+      {{#if hasError}}
+        <div class="form-error">{{error}}</div>
+      {{/if}}
+
+      <form method="POST" action="/register" id="signup-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First Name</label>
+            <input class="form-input" type="text" id="firstName" name="firstName" placeholder="Jane" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last Name</label>
+            <input class="form-input" type="text" id="lastName" name="lastName" placeholder="Smith" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="gender">Gender</label>
+            <select class="form-input form-select" id="gender" name="gender" required>
+              <option value="" disabled selected>Select...</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+              <option value="NB">Non-binary</option>
+              <option value="prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="age">Age</label>
+            <input class="form-input" type="number" id="age" name="age" placeholder="25" min="16" max="100" required>
+          </div>
+        </div>
+
+        <div class="form-divider">// Address</div>
+
+        <div class="form-group">
+          <label class="form-label" for="street">Street</label>
+          <input class="form-input" type="text" id="Street" name="address[Street]" placeholder="123 Main St" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="city">City</label>
+            <input class="form-input" type="text" id="City" name="address[City]" placeholder="Springfield" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="state">State</label>
+            <select class="form-input form-select" id="State" name="address[State]" required>
+              <option value="" disabled selected>State...</option>
+              <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+              <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+              <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+              <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+              <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+              <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+              <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+              <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+              <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+              <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+              <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+              <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+              <option>WI</option><option>WY</option><option>DC</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="zipCode">ZIP Code</label>
+          <input class="form-input" type="text" id="zipCode" name="address[zipCode]" placeholder="07030" pattern="\d{5}" maxlength="5" required>
+        </div>
+
+        <div class="form-divider">// Security</div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 32px;">
+          <label class="form-label" for="confirmPassword">Confirm Password</label>
+          <input class="form-input" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Create Account</button>
+      </form>
+
+      <p class="form-footer">
+        Already have an account? <a href="/signin">Sign in</a>
       </p>
     </div>
   </section>
 </main>
+
+<script type="module" src="/js/form_validate.js"></script>

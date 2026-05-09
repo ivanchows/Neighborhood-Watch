@@ -1,7 +1,9 @@
 import express from 'express';
 import { engine } from 'express-handlebars';
+import session from 'express-session';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import constructorMethod from './index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,19 +23,25 @@ app.set('views', path.join(__dirname, 'views'));
 
 // ---- Static assets (CSS, JS, images) ----
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ---- Session ----
+app.use(session({
+  name: 'AuthState',
+  secret: 'some secret string!',
+  resave: false,
+  saveUninitialized: false
+}));
+
+// ---- Make session user available to all templates ----
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
 
 // ---- Routes ----
-app.get('/', (req, res) => {
-  res.render('home', { title: 'Home' });
-});
-
-app.get('/register.html', (req, res) => {
-  res.render('register', { title: 'Register' });
-});
-
-app.get('/login.html', (req, res) => {
-  res.render('login', { title: 'Sign In' });
-});
+constructorMethod(app);
 
 // ---- Start server ----
 app.listen(PORT, () => {

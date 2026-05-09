@@ -11,8 +11,13 @@
       <a href="/#about">About</a>
     </div>
     <div class="nav-actions">
-      <a href="/login.html" class="nav-signin">Sign In</a>
-      <a href="/register.html" class="nav-cta">Register</a>
+      {{#if user}}
+        <span class="nav-signin">Hello, {{user.firstName}} {{user.lastName}}</span>
+        <a href="/signout" class="nav-cta">Sign Out</a>
+      {{else}}
+        <a href="/signin" class="nav-signin">Sign In</a>
+        <a href="/register" class="nav-cta">Register</a>
+      {{/if}}
     </div>
   </div>
 </nav>
