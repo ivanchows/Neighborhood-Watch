@@ -1,14 +1,21 @@
 {
-  "name": "sentry",
-  "version": "0.1.0",
-  "description": "Sentry — community safety intelligence platform",
+  "name": "project",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "William Crabtree",
+  "type": "module",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "node --watch app.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "express-handlebars": "^7.1.3"
+    "bcrypt": "^6.0.0",
+    "express": "^5.2.1",
+    "express-handlebars": "^9.0.1",
+    "express-session": "^1.19.0",
+    "mongodb": "^7.2.0",
+    "xss": "^1.0.15"
   }
 }
