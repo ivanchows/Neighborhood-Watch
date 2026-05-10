@@ -9,6 +9,22 @@ import{
 
 import {ObjectId} from 'mongodb';
 
+async function geocodeLocation(location) {
+    try {
+        const url = 'https://nominatim.openstreetmap.org/search?q=' +
+            encodeURIComponent(location) + '&format=json&limit=1';
+        const res = await fetch(url, {
+            headers: { 'User-Agent': 'SentryNeighborhoodWatch/1.0 (cs546project)' }
+        });
+        if (!res.ok) return null;
+        const data = JSON.parse(await res.text());
+        if (!data || data.length === 0) return null;
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    } catch (_) {
+        return null;
+    }
+}
+
 const createIncident = async(
     category,
     Title,
@@ -60,6 +76,10 @@ const createIncident = async(
     let notifList = [];
     let commentList = [];
 
+    const coords = await geocodeLocation(location);
+    const lat = coords ? coords.lat : null;
+    const lng = coords ? coords.lng : null;
+
     //Build object
     let newIncident = {
         category: category,
@@ -73,6 +93,8 @@ const createIncident = async(
         status: status,
         likes: likes,
         likedBy: likedBy,
+        lat: lat,
+        lng: lng,
         notifications: notifList,
         comments: commentList
     };
