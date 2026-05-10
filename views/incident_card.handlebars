@@ -1,5 +1,7 @@
 
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <div id="incidentCard">
     <p id="Title">{{incident.Title}}</p>
     <p id="category">category: {{incident.category}}</p>
@@ -8,8 +10,14 @@
     <p id="location">location: {{incident.location}}</p>
     <p id="verified">verified: {{incident.verified}}</p>
     <p id="status">status: {{incident.status}}</p>
+    <p id="likes">likes: {{incident.likes}}</p>
     <p id="reportedBy">reportedBy: {{incident.reportedBy}}</p>
-    <p id="comments">comments: {{incident.comments}}</p>
+    <p>comments:</p>
+    <ul id="comments-list">
+        {{#each incident.comments}}
+            <li>{{this.content}}</li>
+        {{/each}}
+    </ul>
 
     <form id="comment-form" name="comment-form" action="/comment/{{incident._id}}" method="POST" class="form">
         <label>
@@ -19,6 +27,13 @@
         <label>
             submit button 
             <button type="submit" name="submit_button" id="submit_button">Submit!</button>
+        </label>
+    </form>
+
+    <form id="like-form" name="like-form" action="/like/{{incident._id}}" method="POST" class="form">
+        <label>
+            like button 
+            <button type="submit" name="like_button" id="like_button">Add a like to the incident</button>
         </label>
     </form>
 
@@ -34,7 +49,7 @@
 
     {{#if admin}}
         <a id="verifyLink" href="/verify/{{incident._id}}">Verify</a>
-        <a id="memberPageLink" href="/status_update/{{incident._id}}">Update Status</a>
+        <a id="update_incidentLink" href="/status_update/{{incident._id}}">Update Status</a>
         <form id="remove-form" name="remove-form" action="/incident_card{{incident._id}}" method="POST" class="form">
         <label>
             remove button 
