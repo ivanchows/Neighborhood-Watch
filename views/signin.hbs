@@ -1,0 +1,30 @@
+<main>
+  <section style="padding: 100px 0; min-height: 70vh;">
+    <div class="container" style="max-width: 480px;">
+      <div class="section-eyebrow">// Welcome Back</div>
+      <h2 class="section-title">Sign <em>in.</em></h2>
+
+      {{#if hasError}}
+        <p style="color: var(--red); margin-bottom: 20px;">{{error}}</p>
+      {{/if}}
+
+      <form id="signin-form" method="POST" action="/signin" style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <label for="email" style="display:block; margin-bottom:6px; color:var(--text-muted); font-size:13px;">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com"
+            style="width:100%; padding:12px 14px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-size:14px; border-radius:6px; outline:none;">
+        </div>
+        <div>
+          <label for="password" style="display:block; margin-bottom:6px; color:var(--text-muted); font-size:13px;">Password</label>
+          <input id="password" name="password" type="password" placeholder="Password"
+            style="width:100%; padding:12px 14px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-size:14px; border-radius:6px; outline:none;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Sign In</button>
+      </form>
+
+      <p style="margin-top:24px; color:var(--text-muted); font-size:14px;">
+        Don't have an account? <a href="/register" style="color:var(--blue-bright);">Register</a>
+      </p>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,32 @@
+<main>
+  <section style="padding: 80px 0;">
+    <div class="container">
+      <div class="section-eyebrow">// Community Reports</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:40px;">
+        <h2 class="section-title" style="margin-bottom:0;">All <em>incidents.</em></h2>
+        <a href="/incident_create" class="btn btn-primary">+ Report Incident</a>
+      </div>
+
+      {{#if incidents.length}}
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+          {{#each incidents}}
+            <a href="/incident_card/{{_id}}" style="text-decoration:none; color:inherit; display:block; background:var(--surface); padding:20px 24px; transition:background .15s;">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                <span class="badge {{statusClass status}}">{{status}}</span>
+                <span style="font-size:12px; color:var(--text-muted);">{{postedDate}}</span>
+                <span style="font-size:12px; color:var(--text-muted);">{{category}}</span>
+              </div>
+              <div style="font-size:16px; font-weight:500; margin-bottom:4px;">{{Title}}</div>
+              <div style="font-size:13px; color:var(--text-muted);">{{location}}</div>
+            </a>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="panel" style="padding:48px; text-align:center;">
+          <p style="color:var(--text-muted); margin-bottom:20px;">No incidents have been reported yet.</p>
+          <a href="/incident_create" class="btn btn-primary">Be the first to report</a>
+        </div>
+      {{/if}}
+    </div>
+  </section>
+</main>

@@ -28,7 +28,7 @@ const createIncident = async(
     let day = String(today.getDate()).padStart(2, '0');
     let current_month = String(today.getMonth() + 1).padStart(2, '0');
     let current_year = today.getFullYear();
-    let Date = current_month + "/" + day + "/" + current_year;
+    let postedDate = current_month + "/" + day + "/" + current_year;
 
     //Title Error checking
     Title = string_checker(Title);
@@ -49,19 +49,19 @@ const createIncident = async(
     }
 
     //grab username and error check
-    reportedBy = string_checker(reprotedBy);
+    reportedBy = string_checker(reportedBy);
 
     //grab user_id and error check
     user_id = id_checker(user_id);
 
     let status = "Active";
-    let notifications = {};
-    let comments = {};
+    let notifList = [];
+    let commentList = [];
 
     //Build object
-    incident = {
+    let newIncident = {
         category: category,
-        postedDate: Date,
+        postedDate: postedDate,
         Title: Title,
         description: description,
         location: location,
@@ -69,18 +69,18 @@ const createIncident = async(
         userId: user_id,
         verified: "",
         status: status,
-        notifications: notifications,
-        comments: comments
+        notifications: notifList,
+        comments: commentList
     };
-    const incident_collection = await incident();
-    const insert_incident = await incident_collection.insertOne(incident);
+    const incident_collection = await incidents();
+    const insert_incident = await incident_collection.insertOne(newIncident);
     if (!insert_incident.acknowledged || !insert_incident.insertedId){
         throw "Error: could not add incident";
     }
     let result = {
         _id: insert_incident.insertedId.toString(),
         category: category,
-        postedDate: Date,
+        postedDate: postedDate,
         Title: Title,
         description: description,
         location: location,
@@ -88,8 +88,8 @@ const createIncident = async(
         userId: user_id,
         verified: "",
         status: status,
-        notifications: notifications,
-        comments: comments
+        notifications: notifList,
+        comments: commentList
   };
   return result;
 }
@@ -110,7 +110,7 @@ const getOneIncident = async(id) => {
 
     //find incident with id
     let incident_collection = await incidents();
-    const incident = await incident_collection.findOne({_id: new ObjectId(id_stripped)});
+    const incident = await incident_collection.findOne({_id: new ObjectId(id)});
     if (!incident){
         throw "Error: could not find incident with desired id";
     }
@@ -133,7 +133,7 @@ const verifyIncident = async(
 
     //verify error checking
     verify = string_checker(verify);
-    verify = verify.toLocaleLowercase();
+    verify = verify.toLowerCase();
     if (verify !== "yes" && verify !== "no"){
         throw "Error: verify can only be yes or no";
     }
@@ -157,10 +157,10 @@ const verifyIncident = async(
         notifications: incident.notifications,
         comments: incident.comments
     };
-    const updated = await incident_collection.updateOne({_id: new ObjectId(id)}, {$set: updated_incident}, {returnDocument: "After"});
-    updated = await incident_collection.findOne({_id: new ObjectId(id)});
+    await incident_collection.updateOne({_id: new ObjectId(id)}, {$set: updated_incident});
+    let updated = await incident_collection.findOne({_id: new ObjectId(id)});
     if (!updated){
-        throw "Error: incident could not be verifed";
+        throw "Error: incident could not be verified";
     }
     let message = "incident has been verified!";
     return message;
@@ -170,22 +170,27 @@ const verifyIncident = async(
 const updateStatus = async(
     id,
     status,
-    user_role
+    user_role,
+    user_id
 ) => {
     //id error checking
     id = id_checker(id);
 
-    //user_role error checking
-    user_role = string_checker(user_role);
-    if (user_role !== "admin"){
-        throw "Error: user must be an admin to verify incidents";
+    // Allow admins or the incident owner
+    const incident_collection_check = await incidents();
+    const incidentForCheck = await incident_collection_check.findOne({_id: new ObjectId(id)});
+    if (!incidentForCheck) throw "Error: could not find incident with desired id";
+    const isAdmin = string_checker(user_role) === "admin";
+    const isOwner = incidentForCheck.userId === user_id;
+    if (!isAdmin && !isOwner) {
+        throw "Error: you must be an admin or the incident owner to update status";
     }
 
     //status error checking
     status = string_checker(status);
-    status = status.toLocaleLowercase();
+    status = status.toLowerCase();
     if (status !== "active" && status !== "resolved" && status !== "authorities notified"){
-        throw "Error: verify can only be yes or no";
+        throw "Error: status can only be active, resolved, or authorities notified";
     }
 
     //grab incident for update
@@ -207,8 +212,8 @@ const updateStatus = async(
         notifications: incident.notifications,
         comments: incident.comments
     };
-    const updated = await incident_collection.updateOne({_id: new ObjectId(id)}, {$set: updated_incident}, {returnDocument: "After"});
-    updated = await incident_collection.findOne({_id: new ObjectId(id)});
+    await incident_collection.updateOne({_id: new ObjectId(id)}, {$set: updated_incident});
+    let updated = await incident_collection.findOne({_id: new ObjectId(id)});
     if (!updated){
         throw "Error: status could not be updated";
     }
@@ -224,11 +229,9 @@ const removeIncident = async(
     //id error checks
     id = id_checker(id);
 
-    //verified error checks
-    verified = string_checker(verified);
-
-    if (verified !== "no"){
-        throw "Error: verified must be no to remove an incident";
+    // Allow deletion if incident has not been verified (empty string or "no")
+    if (verified !== "" && verified !== "no"){
+        throw "Error: cannot delete a verified incident";
     }
 
     //remove the incident
@@ -308,8 +311,8 @@ const updateIncident = async(
         }
         new_incident.location = location;
     }
-    let updated_incident = await incident_collection.findOneAndUpdate({_id: new ObjectId(incident_id)}, {$set: new_incident}, {returnDocument: "After"});
-    updated_incident = await incident_collection.findOne({_id: new ObjectId(incident_id)});
+    await incident_collection.findOneAndUpdate({_id: new ObjectId(incident_id)}, {$set: new_incident}, {returnDocument: "after"});
+    let updated_incident = await incident_collection.findOne({_id: new ObjectId(incident_id)});
     if (!updated_incident){
         throw "Error: could not properly update incident";
     }
@@ -335,16 +338,16 @@ const createNotif = async(
 
     //error check incident_id
     incident_id = id_checker(incident_id);
-    
+
     //error check user_id
     user_id = id_checker(user_id);
 
     //Build object
-    notif = {
-        name: "name from user data",
-        content = content,
-        incident_id = incident_id,
-        user_id = user_id
+    let notif = {
+        name: name,
+        content: content,
+        incident_id: incident_id,
+        user_id: user_id
     };
     const notif_collection = await notifications();
     const insert_notif = await notif_collection.insertOne(notif);
@@ -353,7 +356,7 @@ const createNotif = async(
     }
 
     //Update incident notif subdocument
-    const incident_collection = await incident();
+    const incident_collection = await incidents();
     let update_incident = await incident_collection.updateOne({_id: new ObjectId(incident_id)}, {
         $push: {notifications: notif},
     });
@@ -377,8 +380,8 @@ const removeNotif = async(id) => {
     }
 
     //update incident notif subdocument
-    const all_remaining_notifs = await notif_collection.findAll({incident_id: removed_notif.incident_id});
-    const incident_collection = await incident();
+    const all_remaining_notifs = await notif_collection.find({incident_id: removed_notif.incident_id}).toArray();
+    const incident_collection = await incidents();
     let updated_incident = await incident_collection.findOneAndUpdate({_id: removed_notif.incident_id}, {$set: {notifications: all_remaining_notifs}});
     if (!updated_incident){
         throw "Error: could not update incident";
@@ -408,8 +411,8 @@ const updateNotif = async(
     }
 
     //update the incident notif subdocument
-    const all_remaining_notifs = await notif_collection.findAll({incident_id: updated_notif.incident_id});
-    const incident_collection = await incident();
+    const all_remaining_notifs = await notif_collection.find({incident_id: updated_notif.incident_id}).toArray();
+    const incident_collection = await incidents();
     let updated_incident = await incident_collection.findOneAndUpdate({_id: updated_notif.incident_id}, {$set: {notifications: all_remaining_notifs}});
     if (!updated_incident){
         throw "Error: could not update incident";
@@ -443,11 +446,11 @@ const createComment = async(
     user_id = id_checker(user_id);
 
     //Build object
-    comment = {
-        name: "name from user data",
-        content = content,
-        incident_id = incident_id,
-        user_id = user_id
+    let comment = {
+        name: name,
+        content: content,
+        incident_id: incident_id,
+        user_id: user_id
     };
     const comment_collection = await comments();
     const insert_comment = await comment_collection.insertOne(comment);
@@ -456,7 +459,7 @@ const createComment = async(
     }
 
     //Update incident comment subdocument
-    const incident_collection = await incident();
+    const incident_collection = await incidents();
     let update_incident = await incident_collection.updateOne({_id: new ObjectId(incident_id)}, {
         $push: {comments: comment},
     });
@@ -481,8 +484,8 @@ const removeComment = async(id) => {
     }
 
     //update incident notif subdocument
-    const all_remaining_comments = await comment_collection.findAll({incident_id: removed_comment.incident_id});
-    const incident_collection = await incident();
+    const all_remaining_comments = await comment_collection.find({incident_id: removed_comment.incident_id}).toArray();
+    const incident_collection = await incidents();
     let updated_incident = await incident_collection.findOneAndUpdate({_id: removed_comment.incident_id}, {$set: {comments: all_remaining_comments}});
     if (!updated_incident){
         throw "Error: could not update incident";
@@ -512,8 +515,8 @@ const updateComment = async(
     }
 
     //update the incident notif subdocument
-    const all_remaining_comments = await comment_collection.findAll({incident_id: updated_comment.incident_id});
-    const incident_collection = await incident();
+    const all_remaining_comments = await comment_collection.find({incident_id: updated_comment.incident_id}).toArray();
+    const incident_collection = await incidents();
     let updated_incident = await incident_collection.findOneAndUpdate({_id: updated_comment.incident_id}, {$set: {comments: all_remaining_comments}});
     if (!updated_incident){
         throw "Error: could not update incident";

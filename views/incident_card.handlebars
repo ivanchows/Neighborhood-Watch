@@ -11,18 +11,8 @@
     <p id="reportedBy">reportedBy: {{incident.reportedBy}}</p>
     <p id="comments">comments: {{incident.comments}}</p>
 
-    <form id="comment-form" name="comment-form" action="/comment/{{incident._id}}" method="POST" class="form">
-        <label>
-            content
-            <input type="text" name="content" id="content" placeholder="Type the content">
-        </label>
-        <label>
-            submit button 
-            <button type="submit" name="submit_button" id="submit_button">Submit!</button>
-        </label>
-    </form>
 
-    {{#if user}}
+{{#if isOwner}}
     <a id="update_incidentLink" href="/incident_update/{{incident._id}}">Update incident</a>
     <form id="remove-form" name="remove-form" action="/incident_card/{{incident._id}}" method="POST" class="form">
         <label>
@@ -34,15 +24,15 @@
 
     {{#if admin}}
         <a id="verifyLink" href="/verify/{{incident._id}}">Verify</a>
-        <a id="memberPageLink" href="/status_update/{{incident._id}}">Update Status</a>
-        <form id="remove-form" name="remove-form" action="/incident_card{{incident._id}}" method="POST" class="form">
+        <a id="memberPageLink" href="/status/{{incident._id}}">Update Status</a>
+        <form id="admin-remove-form" name="admin-remove-form" action="/incident_card/{{incident._id}}" method="POST" class="form">
         <label>
-            remove button 
-            <button type="submit" name="remove_button" id="remove_button">Remove Incident</button>
+            remove button
+            <button type="submit" name="remove_button" id="admin_remove_button">Remove Incident</button>
         </label>
     </form>
     {{/if}}
-    
+
     <a id="incident_createlink" href="/incident_create">Click Here if you want to create an incident</a>
-    <a id="homelink" href="/home">Click Here if you want to return to the home page</a>
+    <a id="homelink" href="/">Click Here if you want to return to the home page</a>
 </div>

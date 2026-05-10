@@ -11,7 +11,8 @@ import {
   checkAge,
   checkAddress,
   checkPassword
-} from '../data/users.js';
+} from './users.js';
+import { getAllIncidents } from './data/incidentfunctions.js';
 
 const router = Router();
 
@@ -32,18 +33,25 @@ function cleanAddress(address) {
 }
 
 router.route('/').get(async (req, res) => {
+  let recentIncidents = [];
+  try {
+    const all = await getAllIncidents();
+    recentIncidents = all.slice(-5).reverse();
+  } catch (_) {}
+
   if (!req.session.user) {
-    res.render('home', {
+    return res.render('home', {
       title: 'Home',
-      notLoggedIn: true
+      notLoggedIn: true,
+      recentIncidents
     });
-    return;
   }
 
   res.render('home', {
     title: 'Home',
     loggedIn: true,
-    user: req.session.user
+    user: req.session.user,
+    recentIncidents
   });
 });
 

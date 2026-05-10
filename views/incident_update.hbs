@@ -1,0 +1,59 @@
+<main>
+  <section style="padding: 80px 0; min-height: 70vh;">
+    <div class="container" style="max-width: 600px;">
+
+      <div style="margin-bottom: 32px;">
+        <a href="/incidents" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">← Back to incidents</a>
+      </div>
+
+      <div class="section-eyebrow">// Edit Report</div>
+      <h2 class="section-title" style="margin-bottom: 36px;">Update this <em>incident.</em></h2>
+
+      <div class="panel" style="padding: 36px;">
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 24px;">Leave a field blank to keep its current value.</p>
+
+        <form id="incident_update-form" action="/incident_update/{{incident._id}}" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+
+          <div>
+            <label for="category" style="display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 13px;">Category</label>
+            <select name="category" id="category" style="width: 100%; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 14px; border-radius: 6px; outline: none;">
+              <option value="">— keep current —</option>
+              <option value="Suspicious Activity" {{#if (eq incident.category "Suspicious Activity")}}selected{{/if}}>Suspicious Activity</option>
+              <option value="Theft" {{#if (eq incident.category "Theft")}}selected{{/if}}>Theft</option>
+              <option value="Vandalism" {{#if (eq incident.category "Vandalism")}}selected{{/if}}>Vandalism</option>
+              <option value="Traffic" {{#if (eq incident.category "Traffic")}}selected{{/if}}>Traffic</option>
+              <option value="Noise" {{#if (eq incident.category "Noise")}}selected{{/if}}>Noise</option>
+              <option value="Animal" {{#if (eq incident.category "Animal")}}selected{{/if}}>Animal</option>
+              <option value="Infrastructure" {{#if (eq incident.category "Infrastructure")}}selected{{/if}}>Infrastructure</option>
+              <option value="Other" {{#if (eq incident.category "Other")}}selected{{/if}}>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="Title" style="display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 13px;">Title</label>
+            <input type="text" name="Title" id="Title" value="{{incident.Title}}" placeholder="Leave blank to keep current title" maxlength="100"
+              style="width: 100%; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 14px; border-radius: 6px; outline: none;">
+          </div>
+
+          <div>
+            <label for="description" style="display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 13px;">Description</label>
+            <textarea name="description" id="description" maxlength="500" rows="5"
+              style="width: 100%; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 14px; border-radius: 6px; outline: none; resize: vertical; font-family: inherit;">{{incident.description}}</textarea>
+          </div>
+
+          <div>
+            <label for="location" style="display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 13px;">Location</label>
+            <input type="text" name="location" id="location" value="{{incident.location}}" placeholder="Leave blank to keep current location" maxlength="100"
+              style="width: 100%; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 14px; border-radius: 6px; outline: none;">
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 4px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">Save Changes</button>
+            <a href="/incidents" class="btn btn-ghost" style="flex: 1; justify-content: center; text-align: center;">Cancel</a>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </section>
+</main>

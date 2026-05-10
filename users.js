@@ -1,4 +1,4 @@
-import { users } from '../config/mongoCollections.js';
+import { users } from './config/mongoCollections.js';
 import bcrypt from 'bcrypt';
 const saltRounds = 16;
 
