@@ -465,7 +465,7 @@ const createNotif = async(
         }
     } catch(e){
         console.log("Error: email failed to send");
-    
+    }
     let message = "Successfully created notification!";
     return message;
 }
