@@ -1,6 +1,7 @@
 import {incidents} from '../config/mongoCollections.js';
 import {notifications} from '../config/mongoCollections.js';
 import {comments} from '../config/mongoCollections.js';
+import {users} from '../config/mongoCollections.js';
 
 import{
     id_checker,
@@ -8,6 +9,17 @@ import{
 } from "./errorchecking.js"
 
 import {ObjectId} from 'mongodb';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: 'live.smtp.mailtrap.io',
+  port: 587,
+  secure: false,
+  auth: {
+    user: '1a2b3c4d5e6f7g',
+    pass: '1a2b3c4d5e6f7g',
+  }
+});
 
 async function geocodeLocation(location) {
     try {
@@ -104,26 +116,35 @@ const createIncident = async(
         throw "Error: could not add incident";
     }
 
-     //grab user collection to send emails:
+   //grab user collection to send emails:
     let user_collection = await users();
-    let emailed_users = await user_collection.find({location: update_incident.location}).toArray();
-    let emailed_users_length = emailed_users.length;
-    for(let i = 0; i < emailed_users_length; i++){
-        let user_location = emailed_users[i].location;
-        if (user_location === update_incident.location){
-            let email = emailed_users[i].email;
-            const mailOptions = {
-                from: 'create email for our website',
-                to: 'email',
-                subject: 'New Notification about an incident near you!',
-                text: 'content provided from user who created this notif'
-            };
-            transponder.sendMail(mailOptions, function(error, info)){
-                if (error){
-                    throw "Error: mail could not be sent!"
-                }
+    try{
+        let user_collection = await users();
+        let emailed_users = await user_collection.find({location: location}).toArray();
+        let emailed_users_length = emailed_users.length;
+        for(let i = 0; i < emailed_users_length; i++){
+            let user_location = emailed_users[i].location;
+            if (user_location === location){
+                let email = emailed_users[i].email;
+                const mailOptions = {
+                    from: 'sentryCS546@gmail.com',
+                    to: email,
+                    subject: 'New Incident Reported in your area!',
+                    text: 'Hello, a new incident has been created in your area. Ig attach incident_id here idk can edit message later'
+                };
+                await transporter.sendMail(mailOptions); 
             }
         }
+    } catch(e){
+        console.log("Error: email failed to send");
+    }
+
+    //update users created incidents field
+    let updated_user = await user_collection.findOneAndUpdate({_id: new ObjectId(user_id)}, 
+    {$push: {filedReports: insert_incident.insertedId}
+    })
+    if (!updated_user){
+        throw "Error: could not update user";
     }
     
     let result = {
@@ -169,17 +190,10 @@ const getOneIncident = async(id) => {
 
 const verifyIncident = async(
     id,
-    verify,
-    user_role
+    verify
 ) => {
     //id error checking
     id = id_checker(id);
-
-    //user_role error checking
-    user_role = string_checker(user_role);
-    if (user_role !== "admin"){
-        throw "Error: user must be an admin to verify incidents";
-    }
 
     //verify error checking
     verify = string_checker(verify);
@@ -212,6 +226,13 @@ const verifyIncident = async(
     let updated = await incident_collection.findOne({_id: new ObjectId(id)});
     if (!updated){
         throw "Error: incident could not be verified";
+    }
+    const user_collection = await users();
+    let updated_user = await user_collection.findOneAndUpdate({_id: new ObjectId(user_id)}, 
+    {$push: {verifiedReports: updated._id}
+    })
+    if (!updated_user){
+        throw "Error: could not update user";
     }
     let message = "incident has been verified!";
     return message;
@@ -417,28 +438,26 @@ const createNotif = async(
     if (!update_incident){
         throw "Error: failed to update incident";
     }
-
     //grab user collection to send emails:
-    let user_collection = await users();
-    let emailed_users = await user_collection.find({location: update_incident.location}).toArray();
-    let emailed_users_length = emailed_users.length;
-    for(let i = 0; i < emailed_users_length; i++){
-        let user_location = emailed_users[i].location;
-        if (user_location === update_incident.location){
-            let email = emailed_users[i].email;
-            const mailOptions = {
-                from: 'create email for our website',
-                to: 'email',
-                subject: 'New Notification about an incident near you!',
-                text: 'content provided from user who created this notif'
-            };
-            transponder.sendMail(mailOptions, function(error, info)){
-                if (error){
-                    throw "Error: mail could not be sent!"
-                }
+    try{
+        let user_collection = await users();
+        let emailed_users = await user_collection.find({location: update_incident.location}).toArray();
+        let emailed_users_length = emailed_users.length;
+        for(let i = 0; i < emailed_users_length; i++){
+            let user_location = emailed_users[i].location;
+            if (user_location === update_incident.location){
+                let email = emailed_users[i].email;
+                const mailOptions = {
+                    from: 'sentryCS546@gmail.com',
+                    to: email,
+                    subject: 'New Incident Reported in your area!',
+                    text: 'Hello, a new incident has been created in your area. Ig attach incident_id here idk can edit message later'
+                };
+                await transporter.sendMail(mailOptions); 
             }
         }
-    }
+    } catch(e){
+        console.log("Error: email failed to send");
     
     let message = "Successfully created notification!";
     return message;
