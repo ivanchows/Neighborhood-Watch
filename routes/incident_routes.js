@@ -104,7 +104,7 @@ router
                 admin = true;
             }
             const hasLiked = (incident.likedBy || []).includes(req.session.user._id.toString());
-            return res.render('incident_card', {title: "Incident Card", incident: incident, admin: admin, isOwner: correct_user, hasLiked: hasLiked});
+            return res.render('incident_card', {title: "Incident Card", incident: incident, admin: admin, user: correct_user, hasLiked: hasLiked});
         } catch(e){
             return res.status(404).render('error', {title: "error", error: e});
         }
