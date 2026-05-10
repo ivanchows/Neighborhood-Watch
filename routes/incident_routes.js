@@ -23,16 +23,20 @@ function requireLogin(req, res, next) {
 }
 
 // List all incidents
-router.route('/incidents')
-    .get(requireLogin, async (req, res) => {
-        try {
-            const allIncidents = await getAllIncidents();
-            return res.render('incidents', {title: "Incidents", incidents: allIncidents});
-        } catch(e) {
-            return res.status(500).render('error', {title: "error", error: e});
+router
+    .route('/incidents')
+    .get(async (req, res) => {
+        try{
+            let incidents = await getAllIncidents();
+            incidents = incidents.map((incident) => {
+                incident._id = incident._id.toString();
+                return incident;
+            });
+            return res.render('incidents', {title: 'All Incidents', incidents: incidents});
+        } catch(e){
+            return res.status(500).render('error', {title: 'error', error: e, error_class: 'error'});
         }
     });
-
 router
     .route('/incident_create')
     .get(requireLogin, async (req, res) =>{
