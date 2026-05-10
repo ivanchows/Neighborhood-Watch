@@ -8,6 +8,7 @@ import {
     updateIncident,
     verifyIncident,
     updateStatus,
+    add_like,
     createNotif,
     removeNotif,
     updateNotif,
@@ -36,23 +37,27 @@ router
             return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
         }
         try{
-            incident_data.category = string_checker(category);
+            incident_data.category = string_checker(incident_data.category);
             if (incident_data.category.length > 100){
                 throw "Error: category cannot be longer than 100 characters";
             }
-            incident_data.Title = string_checker(Title);
+            incident_data.Title = string_checker(incident_data.Title);
             if (incident_data.Title.length > 100){
                 throw "Error: title cannot be longer than 100 characters";
             }
-            incident_data.description = string_checker(description);
+            incident_data.description = string_checker(incident_data.description);
             if (incident_data.description.length > 500){
                 throw "Error: description cannot be longer than 500 characters";
             }
-            incident_data.location = string_checker(location);
-            if (location_data.location.length > 100){
+            incident_data.location = string_checker(incident_data.location);
+            if (incident_data.location.length > 100){
                 throw "Error: location cannot be longer than 100 characters";
             }
             //get reportedBy and user_id and error check them
+            let reportedBy = req.session.user.firstName + " " + req.session.user.lastName;
+            reportedBy = string_checker(reportedBy);
+            let user_id = req.session.user._id;
+            user_id = id_checker(user_id);
         } catch(e){
             return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
         }
@@ -64,7 +69,9 @@ router
             return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
         }
     })
-    .route('/incident_card')
+
+router
+    .route('/incident_card/:id')
     .get(async (req, res) => {
         try{
             req.params.id = id_checker(req.params.id);
@@ -76,10 +83,13 @@ router
             let correct_user = false;
             let admin = false;
             const incident = await getOneIncident(req.params.id);
-            if (user_id = incident.userId){
+            if (req.session.user._id = incident.userId){
                 correct_user = true;
             }
             //get user role, if admin set admin = true
+            if (req.session.user.role === "admin"){
+                admin = true;
+            }
             return res.render("incident_card", {title: "Incident Card"}, {incident: incident}, {admin: admin}, {user: correct_user});
         } catch(e){
             return res.status(404).render('error', {title: "error", error: e, error_class: "error"});
@@ -101,6 +111,7 @@ router
         }
     })
 
+router
     .route('/incident_update/:id')
     .get(async (req, res) => {
         try{
@@ -116,33 +127,45 @@ router
         }
         try{
             req.params.id = id_checker(req.params.id);
-            incident_data.category = string_checker(category);
+            incident_data.category = string_checker(incident_data.category);
             if (incident_data.category.length > 100){
                 throw "Error: category cannot be longer than 100 characters";
             }
-            incident_data.Title = string_checker(Title);
+            incident_data.Title = string_checker(incident_data.Title);
             if (incident_data.Title.length > 100){
                 throw "Error: title cannot be longer than 100 characters";
             }
-            incident_data.description = string_checker(description);
+            incident_data.description = string_checker(incident_data.description);
             if (incident_data.description.length > 500){
                 throw "Error: description cannot be longer than 500 characters";
             }
-            incident_data.location = string_checker(location);
-            if (location_data.location.length > 100){
+            incident_data.location = string_checker(incident_data.location);
+            if (incident_data.location.length > 100){
                 throw "Error: location cannot be longer than 100 characters";
             }
         } catch(e){
             return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
         }
         try{
+            let correct_user = false;
+            let admin = false;
+            const incident = await getOneIncident(req.params.id);
+            if (req.session.user._id = incident.userId){
+                correct_user = true;
+            }
+            //get user role, if admin set admin = true
+            if (req.session.user.role === "admin"){
+                admin = true;
+            }
             const {category, Title, description, location} = incident_data;
             const updated_incident = await updateIncident(req.params.id, category, Title, description, location);
-            //return res.render("i think it would go back home but im not sure");
+            return res.render("incident_card", {title: "Incident Card"}, {incident: incident}, {admin: admin}, {user: correct_user});
         } catch(e){
             return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
         }
     })
+
+router
     .route('/verify/:id')
     .get(async (req, res) =>{
         try{
@@ -151,7 +174,42 @@ router
             return res.status(404).render('error', {title: "error", error: e, error_class: "error"});
         }
     })
+    .post(async (req, res) => {
+        let data = req.body;
+        if (!data){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
+        try{
+            req.params.id = id_checker(req.params.id);
+            data.verified = string_checker(data.verified);
+            data.content = string_checker(data.content);
+            if (data.content.length > 500){
+                throw "Error: content cannot be longer than 500 characters";
+            }
+        } catch(e){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
+        try{
+            let correct_user = false;
+            let admin = false;
+            const incident = await getOneIncident(req.params.id);
+            if (req.session.user._id = incident.userId){
+                correct_user = true;
+            }
+            //get user role, if admin set admin = true
+            if (req.session.user.role === "admin"){
+                admin = true;
+            }
+            const {verified, content} = data;
+            const verified_incident = verifyIncident(incident._id, verified);
+            const created_notif = createNotif(incident.reportedBy, content, incident._id, incident.userId);
+            return res.render("incident_card", {title: "Incident Card"}, {incident: incident}, {admin: admin}, {user: correct_user});
+        } catch(e){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
+    })
 
+router
     .route('/status/:id')
     .get(async (req, res) =>{
         try{
@@ -160,7 +218,42 @@ router
             return res.status(404).render('error', {title: "error", error: e, error_class: "error"});
         }
     })
+    .post(async (req, res) => {
+        let data = req.body;
+        if (!data){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
+        try{
+            req.params.id = id_checker(req.params.id);
+            data.status = string_checker(data.status);
+            data.content = string_checker(data.content);
+            if (data.content.length > 500){
+                throw "Error: content cannot be longer than 500 characters";
+            }
+        } catch(e){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
+        try{
+            let correct_user = false;
+            let admin = false;
+            const incident = await getOneIncident(req.params.id);
+            if (req.session.user._id = incident.userId){
+                correct_user = true;
+            }
+            //get user role, if admin set admin = true
+            if (req.session.user.role === "admin"){
+                admin = true;
+            }
+            const {status, content} = data;
+            const verified_incident = verifyIncident(incident._id, status);
+            const created_notif = createNotif(incident.reportedBy, content, incident._id, incident.userId);
+            return res.render("incident_card", {title: "Incident Card"}, {incident: incident}, {admin: admin}, {user: correct_user});
+        } catch(e){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
+    })
 
+router
     .route('/comment/:id')
     .post(async (req, res) =>{
         let content = req.body;
@@ -182,8 +275,23 @@ router
             let name = incident.reportedBy;
             let user_id = incident.userId;
             const created_comment = await createComment(name, content, incident_id, user_id);
-            return res.render("incident_card", {title: "Incident Card"}, {incident: incident}, {admin: admin}, {user: correct_user});
+            return res.json(created_comment);
         } catch(e){
              return res.status(404).render('error', {title: "error", error: e, error_class: "error"});
         }
     })
+
+router
+    .route('/like/:id')
+    .post(async (req, res) =>{
+        try{
+            const incident = await getOneIncident(req.params.id);
+            let incident_id = incident._id;
+            const added_like = await add_like(name, content, incident_id, user_id);
+            return res.json(added_like);
+        } catch(e){
+             return res.status(404).render('error', {title: "error", error: e, error_class: "error"});
+        }
+    })
+
+    export default router;
