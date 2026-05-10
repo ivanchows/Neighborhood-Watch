@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import xss from 'xss';
-import { getServicesByZip } from './services.js';
+import { getServicesByZip } from './data/services.js';
 
 const router = Router();
 
