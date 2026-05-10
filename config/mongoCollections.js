@@ -17,6 +17,6 @@ const getCollectionFn = (collection) => {
 
 /* Now, you can list your collections here:
 NOTE: YOU WILL NEED TO CHANGE THE CODE BELOW TO HAVE THE COLLECTION(S) REQUIRED BY THE ASSIGNMENT */
-export const incident = getCollectionFn('incidents');
-export const incident = getCollectionFn('notifications');
-export const incident = getCollectionFn('comments');
+export const incidents = getCollectionFn('incidents');
+export const notifications = getCollectionFn('notifications');
+export const comments = getCollectionFn('comments');
