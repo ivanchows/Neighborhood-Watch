@@ -8,6 +8,19 @@ import{
 } from "./errorchecking.js"
 
 import {ObjectId} from 'mongodb';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: 'live.smtp.mailtrap.io',
+  port: 587,
+  secure: false,
+  auth: {
+    user: '1a2b3c4d5e6f7g',
+    pass: '1a2b3c4d5e6f7g',
+  }
+});
+
+//All nodemailer code in this file was based off nodemailer implementation from https://mailtrap.io/blog/javascript-send-email/
 
 const createIncident = async(
     category,
@@ -55,6 +68,7 @@ const createIncident = async(
     user_id = id_checker(user_id);
 
     let status = "Active";
+    let likes = 0;
     let notifications = {};
     let comments = {};
 
@@ -69,6 +83,7 @@ const createIncident = async(
         userId: user_id,
         verified: "",
         status: status,
+        likes: likes,
         notifications: notifications,
         comments: comments
     };
@@ -77,6 +92,36 @@ const createIncident = async(
     if (!insert_incident.acknowledged || !insert_incident.insertedId){
         throw "Error: could not add incident";
     }
+
+    //grab user collection to send emails:
+    //Since i dont have the user collection yet im just gonna write the code in comments
+    /*
+    let user_collection = await users();
+    let emailed_users = await user_collection.findAll({location: location}).toArray();
+    let emailed_users_length = emailed_users.length;
+    for(let i = 0; i < emailed_users_length; i++){
+        let user_location = emailed_users[i].location;
+        if (user_location === location){
+            let email = emailed_users[i].email;
+            const mailOptions = {
+                from: 'create email for our website',
+                to: 'email',
+                subject: 'New Incident Reported in your area!',
+                text: 'Hello, a new incident has been created in your area. Ig attach incident_id here idk can edit message later'
+            };
+            transponder.sendMail(mailOptions, function(error, info)){
+                if (error){
+                    throw "Error: mail could not be sent!"
+                }
+            }
+        }
+    }
+
+    I cant test this code until tomorrow so just pray it works
+    */
+
+
+
     let result = {
         _id: insert_incident.insertedId.toString(),
         category: category,
@@ -88,6 +133,7 @@ const createIncident = async(
         userId: user_id,
         verified: "",
         status: status,
+        likes: likes,
         notifications: notifications,
         comments: comments
   };
@@ -119,17 +165,10 @@ const getOneIncident = async(id) => {
 
 const verifyIncident = async(
     id,
-    verify,
-    user_role
+    verify
 ) => {
     //id error checking
     id = id_checker(id);
-
-    //user_role error checking
-    user_role = string_checker(user_role);
-    if (user_role !== "admin"){
-        throw "Error: user must be an admin to verify incidents";
-    }
 
     //verify error checking
     verify = string_checker(verify);
@@ -154,6 +193,7 @@ const verifyIncident = async(
         userId: incident.userId,
         verified: verify,
         status: incident.status,
+        likes: incident.likes,
         notifications: incident.notifications,
         comments: incident.comments
     };
@@ -169,17 +209,10 @@ const verifyIncident = async(
 
 const updateStatus = async(
     id,
-    status,
-    user_role
+    status
 ) => {
     //id error checking
     id = id_checker(id);
-
-    //user_role error checking
-    user_role = string_checker(user_role);
-    if (user_role !== "admin"){
-        throw "Error: user must be an admin to verify incidents";
-    }
 
     //status error checking
     status = string_checker(status);
@@ -204,6 +237,7 @@ const updateStatus = async(
         userId: incident.userId,
         verified: incident.verified,
         status: status,
+        likes: incident.likes,
         notifications: incident.notifications,
         comments: incident.comments
     };
@@ -214,7 +248,41 @@ const updateStatus = async(
     }
     let message = "Status has been updated!";
     return message;
+}
 
+const add_like = async(id) =>{
+    //id error checking
+    id = id_checker(id);
+
+    //grab incident for update
+    let incident_collection = await incidents();
+    const incident = await incident_collection.findOne({_id: new ObjectId(id)});
+    if (!incident){
+        throw "Error: could not find incident with desired id";
+    }
+    let new_likes = incident.likes + 1;
+
+    let updated_incident = {
+        category: incident.category,
+        postedDate: incident.postedDate,
+        Title: incident.Title,
+        description: incident.description,
+        location: incident.location,
+        reportedBy: incident.reportedBy,
+        userId: incident.userId,
+        verified: incident.verify,
+        status: incident.status,
+        likes: new_likes,
+        notifications: incident.notifications,
+        comments: incident.comments
+    };
+    const updated = await incident_collection.updateOne({_id: new ObjectId(id)}, {$set: updated_incident}, {returnDocument: "After"});
+    updated = await incident_collection.findOne({_id: new ObjectId(id)});
+    if (!updated){
+        throw "Error: incident could not be verifed";
+    }
+    let message = "incident has been verified!";
+    return message;
 }
 
 const removeIncident = async(
@@ -275,6 +343,7 @@ const updateIncident = async(
         userId: og_incident.userId,
         verified: og_incident.verified,
         status: og_incident.status,
+        likes: og_incident.likes,
         notifications: og_incident.notifications,
         comments: og_incident.comments
     };
@@ -341,10 +410,10 @@ const createNotif = async(
 
     //Build object
     notif = {
-        name: "name from user data",
-        content = content,
-        incident_id = incident_id,
-        user_id = user_id
+        name: name,
+        content: content,
+        incident_id: incident_id,
+        user_id: user_id
     };
     const notif_collection = await notifications();
     const insert_notif = await notif_collection.insertOne(notif);
@@ -361,6 +430,31 @@ const createNotif = async(
     if (!update_incident){
         throw "Error: failed to update incident";
     }
+
+    //grab user collection to send emails:
+    //Since i dont have the user collection yet im just gonna write the code in comments
+    /*
+    let user_collection = await users();
+    let emailed_users = await user_collection.findAll({location: update_incident.location}).toArray();
+    let emailed_users_length = emailed_users.length;
+    for(let i = 0; i < emailed_users_length; i++){
+        let user_location = emailed_users[i].location;
+        if (user_location === update_incident.location){
+            let email = emailed_users[i].email;
+            const mailOptions = {
+                from: 'create email for our website',
+                to: 'email',
+                subject: 'New Notification about an incident near you!',
+                text: 'content provided from user who created this notif'
+            };
+            transponder.sendMail(mailOptions, function(error, info)){
+                if (error){
+                    throw "Error: mail could not be sent!"
+                }
+            }
+        }
+    }
+    */
     let message = "Successfully created notification!";
     return message;
 }
@@ -444,10 +538,10 @@ const createComment = async(
 
     //Build object
     comment = {
-        name: "name from user data",
-        content = content,
-        incident_id = incident_id,
-        user_id = user_id
+        name: name,
+        content: content,
+        incident_id: incident_id,
+        user_id: user_id
     };
     const comment_collection = await comments();
     const insert_comment = await comment_collection.insertOne(comment);
@@ -531,6 +625,7 @@ export{
     updateIncident,
     verifyIncident,
     updateStatus,
+    add_like,
     createNotif,
     removeNotif,
     updateNotif,
