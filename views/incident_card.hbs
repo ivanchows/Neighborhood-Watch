@@ -8,7 +8,7 @@
 
       <div class="panel" style="padding: 36px;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-          <span class="badge {{statusClass incident.status}}">{{incident.status}}</span>
+          <span class="badge {{statusClass incident.status}}">{{titleCase incident.status}}</span>
           {{#if incident.verified}}
             <span class="badge" style="color: var(--green); border-color: var(--green);">Verified</span>
           {{/if}}
@@ -31,9 +31,23 @@
             <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Verifications</div>
             <div style="font-size: 14px;">{{incident.verified}}</div>
           </div>
+          <div style="background: var(--surface-2); padding: 16px 20px;">
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Likes</div>
+            <div style="font-size: 14px;">{{incident.likes}}</div>
+          </div>
         </div>
 
         <p style="font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 32px;">{{incident.description}}</p>
+
+        <div style="padding-top: 20px;">
+          {{#if hasLiked}}
+            <button type="button" class="btn btn-ghost" style="font-size: 13px; opacity: 0.5; cursor: not-allowed;" disabled>Already liked</button>
+          {{else}}
+            <form action="/like/{{incident._id}}" method="POST" style="margin: 0; display: inline;">
+              <button type="submit" name="like_button" id="like_button" class="btn btn-ghost" style="font-size: 13px;">Add a like to the incident</button>
+            </form>
+          {{/if}}
+        </div>
 
         {{#if isOwner}}
         <div style="display: flex; gap: 10px; flex-wrap: wrap; padding-top: 24px; border-top: 1px solid var(--border);">

@@ -13,6 +13,7 @@ import {
   checkPassword
 } from './users.js';
 import { getAllIncidents } from './data/incidentfunctions.js';
+import { incidents as incidentCol } from './config/mongoCollections.js';
 
 const router = Router();
 
@@ -32,27 +33,48 @@ function cleanAddress(address) {
   };
 }
 
+const SEED_INCIDENTS = [
+  { category: 'Suspicious Activity', Title: 'Suspicious vehicle parked overnight', description: 'Black sedan with no plates parked across two spaces since around 11pm. Multiple residents noted it doesn\'t belong to anyone on the block. Police have been notified for a wellness check.', location: 'Washington St & 7th St, Hoboken', status: 'active', likes: 12, lat: 40.7459, lng: -74.0285 },
+  { category: 'Animal', Title: 'Loose dog reported near Pier A', description: 'Medium-sized brown dog, no visible collar, friendly but disoriented. Last seen heading toward Sinatra Drive. Animal control contacted.', location: 'Pier A Park, NW corner, Hoboken', status: 'authorities notified', likes: 8, lat: 40.7365, lng: -74.0276 },
+  { category: 'Utilities', Title: 'Power outage on block', description: 'Power has been out for the entire 400 block since 9:42 PM. PSE&G has been notified, ETA unknown. Streetlights and traffic signal also affected.', location: 'Hudson St between 4th and 5th, Hoboken', status: 'active', likes: 24, lat: 40.7409, lng: -74.0298 },
+  { category: 'Traffic', Title: 'Minor traffic incident, fender bender', description: 'Two-car collision at the intersection. No injuries reported. Hoboken PD on scene, traffic now flowing again.', location: 'Observer Hwy & Newark St, Hoboken', status: 'resolved', likes: 6, lat: 40.7374, lng: -74.0418 },
+  { category: 'Theft', Title: 'Package theft — suspect identified', description: 'Doorbell camera caught the suspect on the 800 block. Footage shared with HPD and posted to the building\'s thread. Most packages were recovered from a nearby alley.', location: 'Garden St residential block, Hoboken', status: 'resolved', likes: 31, lat: 40.7479, lng: -74.0328 }
+];
+
 router.route('/').get(async (req, res) => {
   let recentIncidents = [];
   try {
-    const all = await getAllIncidents();
+    let all = await getAllIncidents();
+
+    // Seed demo incidents if none of the static titles exist yet
+    const titles = all.map(i => i.Title);
+    if (!titles.includes('Suspicious vehicle parked overnight')) {
+      const col = await incidentCol();
+      const today = new Date();
+      const postedDate = String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0') + '/' + today.getFullYear();
+      await col.insertMany(SEED_INCIDENTS.map(s => ({
+        ...s,
+        postedDate,
+        reportedBy: 'Sentry Demo',
+        userId: '000000000000000000000000',
+        verified: '',
+        likedBy: [],
+        notifications: [],
+        comments: []
+      })));
+      all = await getAllIncidents();
+    }
+
     recentIncidents = all.slice(-5).reverse();
   } catch (_) {}
 
-  if (!req.session.user) {
-    return res.render('home', {
-      title: 'Home',
-      notLoggedIn: true,
-      recentIncidents
-    });
-  }
+  const mapIncidents = recentIncidents
+    .filter(i => i.lat && i.lng)
+    .map(i => ({ _id: i._id.toString(), title: i.Title, loc: i.location, status: i.status, lat: i.lat, lng: i.lng }));
 
-  res.render('home', {
-    title: 'Home',
-    loggedIn: true,
-    user: req.session.user,
-    recentIncidents
-  });
+  const ctx = { title: 'Home', recentIncidents, mapIncidentsJSON: JSON.stringify(mapIncidents) };
+  if (!req.session.user) return res.render('home', { ...ctx, notLoggedIn: true });
+  res.render('home', { ...ctx, loggedIn: true, user: req.session.user });
 });
 
 router

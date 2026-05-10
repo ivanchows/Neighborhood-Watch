@@ -9,8 +9,8 @@ const constructorMethod = (app) => {
     app.use('/', incidentRoutes);
     app.use('/', serviceRoutes);
 
-    app.use(/(.*)/, (_req, res) => {
-        res.status(404).json({ error: 'Not found' });
+    app.use((_req, res) => {
+        res.status(404).render('error', { title: 'Error', error: 'Page not found' });
     });
 };
 

@@ -12,7 +12,7 @@
           {{#each incidents}}
             <a href="/incident_card/{{_id}}" style="text-decoration:none; color:inherit; display:block; background:var(--surface); padding:20px 24px; transition:background .15s;">
               <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                <span class="badge {{statusClass status}}">{{status}}</span>
+                <span class="badge {{statusClass status}}">{{titleCase status}}</span>
                 <span style="font-size:12px; color:var(--text-muted);">{{postedDate}}</span>
                 <span style="font-size:12px; color:var(--text-muted);">{{category}}</span>
               </div>

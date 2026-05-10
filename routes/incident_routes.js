@@ -8,6 +8,7 @@ import {
     updateIncident,
     verifyIncident,
     updateStatus,
+    add_like,
     createComment
 } from '../data/incidentfunctions.js';
 
@@ -98,7 +99,8 @@ router
             if (req.session.user.role === "admin") {
                 admin = true;
             }
-            return res.render('incident_card', {title: "Incident Card", incident: incident, admin: admin, isOwner: correct_user});
+            const hasLiked = (incident.likedBy || []).includes(req.session.user._id.toString());
+            return res.render('incident_card', {title: "Incident Card", incident: incident, admin: admin, isOwner: correct_user, hasLiked: hasLiked});
         } catch(e){
             return res.status(404).render('error', {title: "error", error: e});
         }
@@ -244,6 +246,19 @@ router
             return res.redirect('/incident_card/' + req.params.id);
         } catch(e){
              return res.status(404).render('error', {title: "error", error: e});
+        }
+    });
+
+router
+    .route('/like/:id')
+    .post(requireLogin, async (req, res) => {
+        try {
+            req.params.id = id_checker(req.params.id);
+            const user_id = req.session.user._id.toString();
+            await add_like(req.params.id, user_id);
+            return res.redirect('/incident_card/' + req.params.id);
+        } catch(e) {
+            return res.status(400).render('error', {title: "error", error: e});
         }
     });
 

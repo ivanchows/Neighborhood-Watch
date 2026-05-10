@@ -19,6 +19,10 @@ const hbsConfig = {
   partialsDir: path.join(__dirname, 'views/partials'),
   helpers: {
     eq: (a, b) => a === b,
+    titleCase: (str) => {
+      if (!str) return '';
+      return str.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    },
     statusClass: (status) => {
       if (!status) return '';
       const s = status.toLowerCase();

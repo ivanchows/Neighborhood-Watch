@@ -55,6 +55,8 @@ const createIncident = async(
     user_id = id_checker(user_id);
 
     let status = "Active";
+    let likes = 0;
+    let likedBy = [];
     let notifList = [];
     let commentList = [];
 
@@ -69,6 +71,8 @@ const createIncident = async(
         userId: user_id,
         verified: "",
         status: status,
+        likes: likes,
+        likedBy: likedBy,
         notifications: notifList,
         comments: commentList
     };
@@ -88,6 +92,7 @@ const createIncident = async(
         userId: user_id,
         verified: "",
         status: status,
+        likes: likes,
         notifications: notifList,
         comments: commentList
   };
@@ -154,6 +159,7 @@ const verifyIncident = async(
         userId: incident.userId,
         verified: verify,
         status: incident.status,
+        likes: incident.likes || 0,
         notifications: incident.notifications,
         comments: incident.comments
     };
@@ -209,6 +215,7 @@ const updateStatus = async(
         userId: incident.userId,
         verified: incident.verified,
         status: status,
+        likes: incident.likes || 0,
         notifications: incident.notifications,
         comments: incident.comments
     };
@@ -278,6 +285,7 @@ const updateIncident = async(
         userId: og_incident.userId,
         verified: og_incident.verified,
         status: og_incident.status,
+        likes: og_incident.likes || 0,
         notifications: og_incident.notifications,
         comments: og_incident.comments
     };
@@ -526,6 +534,25 @@ const updateComment = async(
 
 }
 
+const add_like = async(id, user_id) => {
+    id = id_checker(id);
+    user_id = id_checker(user_id);
+
+    let incident_collection = await incidents();
+    const incident = await incident_collection.findOne({_id: new ObjectId(id)});
+    if (!incident) throw "Error: could not find incident with desired id";
+
+    const likedBy = incident.likedBy || [];
+    if (likedBy.includes(user_id)) throw "Error: you have already liked this incident";
+
+    let new_likes = (incident.likes || 0) + 1;
+    await incident_collection.updateOne({_id: new ObjectId(id)}, {
+        $set: {likes: new_likes},
+        $push: {likedBy: user_id}
+    });
+    return new_likes;
+}
+
 export{
     createIncident,
     getAllIncidents,
@@ -534,6 +561,7 @@ export{
     updateIncident,
     verifyIncident,
     updateStatus,
+    add_like,
     createNotif,
     removeNotif,
     updateNotif,
