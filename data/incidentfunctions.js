@@ -190,10 +190,17 @@ const getOneIncident = async(id) => {
 
 const verifyIncident = async(
     id,
-    verify
+    verify,
+    user_role
 ) => {
     //id error checking
     id = id_checker(id);
+
+    //user role error checks
+    user_role = string_checker(user_role);
+    if (user_role !== "admin"){
+        throw "Error: user_role must be admin";
+    }
 
     //verify error checking
     verify = string_checker(verify);
