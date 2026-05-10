@@ -80,7 +80,7 @@
     <div class="container">
       <div class="section-eyebrow">// Live Activity</div>
       <h2 class="section-title">Real-time view of <em>your block.</em></h2>
-      <p class="section-lede">Every report is geolocated, verified by neighbors, and delivered with proximity-aware alerts. Powered by Google Maps.</p>
+      <p class="section-lede">Every report is geolocated, verified by neighbors, and delivered with proximity-aware alerts.</p>
 
       <div class="live-grid">
         <div class="panel">
@@ -88,25 +88,7 @@
             <span>Community Map · Hoboken, NJ</span>
             <span class="panel-status"><span class="live-dot"></span>LIVE</span>
           </div>
-          <div class="map-area">
-            <svg viewBox="0 0 600 450" style="position:absolute;inset:0;width:100%;height:100%;">
-              <defs>
-                <pattern id="streets" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-                  <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#1f242c" stroke-width="1"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#streets)"/>
-              <line x1="0" y1="180" x2="600" y2="180" stroke="#2a3140" stroke-width="3"/>
-              <line x1="240" y1="0" x2="240" y2="450" stroke="#2a3140" stroke-width="3"/>
-              <line x1="0" y1="340" x2="600" y2="340" stroke="#2a3140" stroke-width="2"/>
-              <rect x="320" y="40" width="120" height="100" fill="#0d2419" opacity="0.55"/>
-              <rect x="60" y="280" width="80" height="50" fill="#0d2419" opacity="0.55"/>
-            </svg>
-            <div class="map-pin" data-incident="0" style="top:32%; left:42%;"></div>
-            <div class="map-pin amber" data-incident="1" style="top:58%; left:28%;"></div>
-            <div class="map-pin" data-incident="2" style="top:71%; left:65%;"></div>
-            <div class="map-pin red" data-incident="3" style="top:24%; left:72%;"></div>
-            <div class="map-pin" data-incident="4" style="top:48%; left:80%;"></div>
+          <div class="map-area" id="incidentMap" aria-label="Interactive incident map">
             <div class="map-overlay">Lat <span>40.7440</span>  Lng <span>-74.0324</span></div>
             <div class="map-hint">Click any pin →</div>
           </div>

@@ -4,6 +4,7 @@ const incidents = [
       time: '2 min ago · 0.3 mi',
       title: 'Suspicious vehicle parked overnight',
       loc: 'Washington St & 7th St, Hoboken',
+      lat: 40.7459, lng: -74.0285,
       desc: 'Black sedan with no plates parked across two spaces since around 11pm. Multiple residents have noted it doesn\u2019t belong to anyone on the block. Police have been notified for a wellness check.',
       verify: 12, comments: 5, distance: '0.3 mi'
     },
@@ -12,6 +13,7 @@ const incidents = [
       time: '14 min ago · 0.5 mi',
       title: 'Loose dog reported near Pier A',
       loc: 'Pier A Park, NW corner, Hoboken',
+      lat: 40.7365, lng: -74.0276,
       desc: 'Medium-sized brown dog, no visible collar, friendly but disoriented. Last seen heading toward Sinatra Drive. Animal control contacted; volunteer attempting to corral.',
       verify: 8, comments: 11, distance: '0.5 mi'
     },
@@ -20,6 +22,7 @@ const incidents = [
       time: '22 min ago · 0.8 mi',
       title: 'Power outage on block',
       loc: 'Hudson St between 4th and 5th, Hoboken',
+      lat: 40.7409, lng: -74.0298,
       desc: 'Power has been out for the entire 400 block since 9:42 PM. PSE&G has been notified, ETA unknown. Streetlights and traffic signal at intersection are also affected \u2014 drive carefully.',
       verify: 24, comments: 9, distance: '0.8 mi'
     },
@@ -28,6 +31,7 @@ const incidents = [
       time: '1 hr ago · 1.2 mi',
       title: 'Minor traffic incident, fender bender',
       loc: 'Observer Hwy & Newark St, Hoboken',
+      lat: 40.7374, lng: -74.0418,
       desc: 'Two-car collision at the intersection. No injuries reported. Hoboken PD on scene, both vehicles moved to the shoulder, traffic now flowing again.',
       verify: 6, comments: 2, distance: '1.2 mi'
     },
@@ -36,6 +40,7 @@ const incidents = [
       time: '3 hr ago · 0.7 mi',
       title: 'Package theft \u2014 suspect identified',
       loc: 'Garden St residential block, Hoboken',
+      lat: 40.7479, lng: -74.0328,
       desc: 'Doorbell camera caught the suspect on the 800 block. Footage shared with HPD and posted to the building\u2019s thread. Most packages were recovered from a nearby alley by neighbors within the hour.',
       verify: 31, comments: 18, distance: '0.7 mi'
     }
@@ -43,9 +48,11 @@ const incidents = [
 
   const modal = document.getElementById('modal');
   const closeBtn = document.getElementById('modalClose');
+  const mapElement = document.getElementById('incidentMap');
+  const feedItems = document.querySelectorAll('.feed-item[data-incident]');
 
-  function openIncident(idx) {
-    const i = incidents[idx];
+  function openIncident(index) {
+    const i = incidents[index];
     if (!i) return;
     const badge = document.getElementById('modalBadge');
     badge.textContent = i.status;
@@ -65,9 +72,75 @@ const incidents = [
     document.body.style.overflow = '';
   }
 
+  function markerClassForIncident(incident) {
+    if (incident.status === 'RESOLVED') return 'incident-marker resolved';
+    if (incident.status === 'NOTIFIED') return 'incident-marker notified';
+    return 'incident-marker active';
+  }
+
+  function buildPopupContent(incident) {
+    const popup = document.createElement('div');
+    const title = document.createElement('strong');
+    const meta = document.createElement('span');
+    const location = document.createElement('small');
+
+    title.textContent = incident.title;
+    meta.textContent = `${incident.status} · ${incident.time}`;
+    location.textContent = incident.loc;
+
+    popup.append(title, meta, location);
+    return popup;
+  }
+
+  function initIncidentMap() {
+    if (!mapElement || typeof L === 'undefined') return;
+
+    const map = L.map(mapElement, {
+      scrollWheelZoom: false,
+      zoomControl: true
+    }).setView([40.7433, -74.0324], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const markers = incidents.map((incident, index) => {
+      const marker = L.marker([incident.lat, incident.lng], {
+        title: incident.title,
+        icon: L.divIcon({
+          className: markerClassForIncident(incident),
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+          popupAnchor: [0, -12]
+        })
+      }).addTo(map);
+
+      marker.bindPopup(buildPopupContent(incident));
+
+      marker.on('click', () => {
+        openIncident(index);
+        feedItems.forEach(item => item.classList.toggle('selected', Number(item.dataset.incident) === index));
+      });
+
+      return marker;
+    });
+
+    const bounds = L.latLngBounds(incidents.map(incident => [incident.lat, incident.lng]));
+    map.fitBounds(bounds, { padding: [44, 44], maxZoom: 15 });
+
+    feedItems.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        const index = Number(item.dataset.incident);
+        markers[index]?.openPopup();
+      });
+    });
+  }
+
   document.querySelectorAll('[data-incident]').forEach(el => {
     el.addEventListener('click', () => openIncident(parseInt(el.dataset.incident, 10)));
   });
   closeBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  initIncidentMap();
