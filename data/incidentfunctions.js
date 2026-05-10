@@ -103,6 +103,29 @@ const createIncident = async(
     if (!insert_incident.acknowledged || !insert_incident.insertedId){
         throw "Error: could not add incident";
     }
+
+     //grab user collection to send emails:
+    let user_collection = await users();
+    let emailed_users = await user_collection.find({location: update_incident.location}).toArray();
+    let emailed_users_length = emailed_users.length;
+    for(let i = 0; i < emailed_users_length; i++){
+        let user_location = emailed_users[i].location;
+        if (user_location === update_incident.location){
+            let email = emailed_users[i].email;
+            const mailOptions = {
+                from: 'create email for our website',
+                to: 'email',
+                subject: 'New Notification about an incident near you!',
+                text: 'content provided from user who created this notif'
+            };
+            transponder.sendMail(mailOptions, function(error, info)){
+                if (error){
+                    throw "Error: mail could not be sent!"
+                }
+            }
+        }
+    }
+    
     let result = {
         _id: insert_incident.insertedId.toString(),
         category: category,
@@ -394,6 +417,29 @@ const createNotif = async(
     if (!update_incident){
         throw "Error: failed to update incident";
     }
+
+    //grab user collection to send emails:
+    let user_collection = await users();
+    let emailed_users = await user_collection.find({location: update_incident.location}).toArray();
+    let emailed_users_length = emailed_users.length;
+    for(let i = 0; i < emailed_users_length; i++){
+        let user_location = emailed_users[i].location;
+        if (user_location === update_incident.location){
+            let email = emailed_users[i].email;
+            const mailOptions = {
+                from: 'create email for our website',
+                to: 'email',
+                subject: 'New Notification about an incident near you!',
+                text: 'content provided from user who created this notif'
+            };
+            transponder.sendMail(mailOptions, function(error, info)){
+                if (error){
+                    throw "Error: mail could not be sent!"
+                }
+            }
+        }
+    }
+    
     let message = "Successfully created notification!";
     return message;
 }
