@@ -48,11 +48,11 @@ const incidents = [
 
   const modal = document.getElementById('modal');
   const closeBtn = document.getElementById('modalClose');
-  const mapEl = document.getElementById('incidentMap');
+  const mapElement = document.getElementById('incidentMap');
   const feedItems = document.querySelectorAll('.feed-item[data-incident]');
 
-  function openIncident(idx) {
-    const i = incidents[idx];
+  function openIncident(index) {
+    const i = incidents[index];
     if (!i) return;
     const badge = document.getElementById('modalBadge');
     badge.textContent = i.status;
@@ -93,9 +93,9 @@ const incidents = [
   }
 
   function initIncidentMap() {
-    if (!mapEl || typeof L === 'undefined') return;
+    if (!mapElement || typeof L === 'undefined') return;
 
-    const map = L.map(mapEl, {
+    const map = L.map(mapElement, {
       scrollWheelZoom: false,
       zoomControl: true
     }).setView([40.7433, -74.0324], 14);
@@ -105,7 +105,7 @@ const incidents = [
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    const markers = incidents.map((incident, idx) => {
+    const markers = incidents.map((incident, index) => {
       const marker = L.marker([incident.lat, incident.lng], {
         title: incident.title,
         icon: L.divIcon({
@@ -119,8 +119,8 @@ const incidents = [
       marker.bindPopup(buildPopupContent(incident));
 
       marker.on('click', () => {
-        openIncident(idx);
-        feedItems.forEach(item => item.classList.toggle('selected', Number(item.dataset.incident) === idx));
+        openIncident(index);
+        feedItems.forEach(item => item.classList.toggle('selected', Number(item.dataset.incident) === index));
       });
 
       return marker;
@@ -131,8 +131,8 @@ const incidents = [
 
     feedItems.forEach(item => {
       item.addEventListener('mouseenter', () => {
-        const idx = Number(item.dataset.incident);
-        markers[idx]?.openPopup();
+        const index = Number(item.dataset.incident);
+        markers[index]?.openPopup();
       });
     });
   }
