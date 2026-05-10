@@ -4,13 +4,14 @@
       <div class="hero-inner">
         <div>
           <div class="hero-eyebrow">
-            <span class="live-dot"></span>
             <span>Community Safety Intelligence</span>
           </div>
           <h1 class="hero-title">A neighborhood that <em>watches itself.</em></h1>
           <p class="hero-sub">Sentry connects residents with local services and each other — turning passive observation into active, coordinated community protection.</p>
           <div class="hero-cta">
-            <a href="/register" class="btn btn-primary">Create Account →</a>
+            {{#unless user}}
+              <a href="/register" class="btn btn-primary">Create Account →</a>
+            {{/unless}}
             <a href="#live" class="btn btn-ghost">View Live Map</a>
           </div>
         </div>
@@ -32,24 +33,10 @@
             <line x1="73" y1="73" x2="327" y2="327" stroke="#1f242c" stroke-width="1"/>
             <line x1="73" y1="327" x2="327" y2="73" stroke="#1f242c" stroke-width="1"/>
             <circle cx="282" cy="138" r="5" fill="#4169E1"/>
-            <circle cx="282" cy="138" r="5" fill="none" stroke="#4169E1" stroke-width="1.5">
-              <animate attributeName="r" from="5" to="22" dur="2.4s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" from="0.8" to="0" dur="2.4s" repeatCount="indefinite"/>
-            </circle>
             <circle cx="135" cy="245" r="5" fill="#F4A847"/>
-            <circle cx="135" cy="245" r="5" fill="none" stroke="#F4A847" stroke-width="1.5">
-              <animate attributeName="r" from="5" to="22" dur="2.4s" begin="0.7s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" from="0.8" to="0" dur="2.4s" begin="0.7s" repeatCount="indefinite"/>
-            </circle>
             <circle cx="248" cy="282" r="5" fill="#4169E1"/>
-            <circle cx="248" cy="282" r="5" fill="none" stroke="#4169E1" stroke-width="1.5">
-              <animate attributeName="r" from="5" to="22" dur="2.4s" begin="1.4s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" from="0.8" to="0" dur="2.4s" begin="1.4s" repeatCount="indefinite"/>
-            </circle>
             <circle cx="200" cy="200" r="3" fill="#7A93EB"/>
-            <circle cx="200" cy="200" r="6" fill="none" stroke="#7A93EB" stroke-width="1" opacity="0.5"/>
           </svg>
-          <div class="radar-sweep"></div>
         </div>
       </div>
     </div>
@@ -86,7 +73,7 @@
         <div class="panel">
           <div class="panel-header">
             <span>Community Map · Hoboken, NJ</span>
-            <span class="panel-status"><span class="live-dot"></span>LIVE</span>
+            <span class="panel-status">LIVE</span>
           </div>
           <div class="map-area">
             <svg viewBox="0 0 600 450" style="position:absolute;inset:0;width:100%;height:100%;">
@@ -102,62 +89,34 @@
               <rect x="320" y="40" width="120" height="100" fill="#0d2419" opacity="0.55"/>
               <rect x="60" y="280" width="80" height="50" fill="#0d2419" opacity="0.55"/>
             </svg>
-            <div class="map-pin" data-incident="0" style="top:32%; left:42%;"></div>
-            <div class="map-pin amber" data-incident="1" style="top:58%; left:28%;"></div>
-            <div class="map-pin" data-incident="2" style="top:71%; left:65%;"></div>
-            <div class="map-pin red" data-incident="3" style="top:24%; left:72%;"></div>
-            <div class="map-pin" data-incident="4" style="top:48%; left:80%;"></div>
-            <div class="map-overlay">Lat <span>40.7440</span>  Lng <span>-74.0324</span></div>
-            <div class="map-hint">Click any pin →</div>
+            <div class="map-pin pin-0" data-incident="0"></div>
+            <div class="map-pin amber pin-1" data-incident="1"></div>
+            <div class="map-pin pin-2" data-incident="2"></div>
+            <div class="map-pin red pin-3" data-incident="3"></div>
+            <div class="map-pin pin-4" data-incident="4"></div>
           </div>
         </div>
 
         <div class="panel feed">
           <div class="panel-header">
             <span>Incident Feed</span>
-            <span>5 reports</span>
+            <span>{{recentIncidents.length}} reports</span>
           </div>
           <div class="feed-list">
-            <div class="feed-item" data-incident="0">
-              <div class="feed-meta">
-                <span class="badge badge-active">ACTIVE</span>
-                <span>2 min ago · 0.3 mi</span>
-              </div>
-              <div class="feed-title">Suspicious vehicle parked overnight</div>
-              <div class="feed-loc">Washington St &amp; 7th St</div>
-            </div>
-            <div class="feed-item" data-incident="1">
-              <div class="feed-meta">
-                <span class="badge badge-notified">NOTIFIED</span>
-                <span>14 min ago · 0.5 mi</span>
-              </div>
-              <div class="feed-title">Loose dog reported near Pier A</div>
-              <div class="feed-loc">Pier A Park, NW corner</div>
-            </div>
-            <div class="feed-item" data-incident="2">
-              <div class="feed-meta">
-                <span class="badge badge-active">ACTIVE</span>
-                <span>22 min ago · 0.8 mi</span>
-              </div>
-              <div class="feed-title">Power outage on block</div>
-              <div class="feed-loc">Hudson St btwn 4th – 5th</div>
-            </div>
-            <div class="feed-item" data-incident="3">
-              <div class="feed-meta">
-                <span class="badge badge-resolved">RESOLVED</span>
-                <span>1 hr ago · 1.2 mi</span>
-              </div>
-              <div class="feed-title">Minor traffic incident, fender bender</div>
-              <div class="feed-loc">Observer Hwy &amp; Newark St</div>
-            </div>
-            <div class="feed-item" data-incident="4">
-              <div class="feed-meta">
-                <span class="badge badge-resolved">RESOLVED</span>
-                <span>3 hr ago · 0.7 mi</span>
-              </div>
-              <div class="feed-title">Package theft — suspect identified</div>
-              <div class="feed-loc">Garden St residential block</div>
-            </div>
+            {{#each recentIncidents}}
+              <a href="/incident_card/{{_id}}" class="feed-link">
+                <div class="feed-item">
+                  <div class="feed-meta">
+                    <span class="badge badge-active">{{status}}</span>
+                    <span>{{postedDate}}</span>
+                  </div>
+                  <div class="feed-title">{{Title}}</div>
+                  <div class="feed-loc">{{location}}</div>
+                </div>
+              </a>
+            {{else}}
+              <div class="panel-empty-msg">No incidents reported yet.</div>
+            {{/each}}
           </div>
         </div>
       </div>
@@ -236,40 +195,33 @@
           <div class="compare-cell">CITIZEN</div>
         </div>
         <div class="compare-row">
-          <div class="compare-cell" style="color:var(--text-muted)">Verified reports</div>
+          <div class="compare-cell" class="compare-label">Verified reports</div>
           <div class="compare-cell check">✓  Admin + neighbor</div>
           <div class="compare-cell partial">Light moderation</div>
           <div class="compare-cell partial">Inconsistent</div>
         </div>
         <div class="compare-row">
-          <div class="compare-cell" style="color:var(--text-muted)">Anxiety calibration</div>
+          <div class="compare-cell" class="compare-label">Anxiety calibration</div>
           <div class="compare-cell check">✓  Balanced tone</div>
           <div class="compare-cell partial">Casual / off-topic</div>
           <div class="compare-cell cross">High / alarmist</div>
         </div>
         <div class="compare-row">
-          <div class="compare-cell" style="color:var(--text-muted)">Proactive routing</div>
+          <div class="compare-cell" class="compare-label">Proactive routing</div>
           <div class="compare-cell check">✓  Safe-path engine</div>
           <div class="compare-cell cross">—</div>
           <div class="compare-cell cross">—</div>
         </div>
         <div class="compare-row">
-          <div class="compare-cell" style="color:var(--text-muted)">Local services link</div>
+          <div class="compare-cell" class="compare-label">Local services link</div>
           <div class="compare-cell check">✓  Direct contact</div>
           <div class="compare-cell cross">—</div>
           <div class="compare-cell partial">Live updates only</div>
         </div>
       </div>
 
-      <div class="cta-block" id="about">
-        <h2 class="section-title" style="margin: 0 auto 16px; text-align:center;">Be the eyes <em>of your block.</em></h2>
-        <p style="color:var(--text-muted); max-width:520px; margin: 0 auto 32px;">Join the watch. Verify what matters. Sleep a little easier.</p>
-        <a href="/register" class="btn btn-primary">Request Early Access →</a>
-      </div>
     </div>
   </section>
 </main>
-
-{{> incident-modal}}
 
 <script type="module" src="/js/home.js"></script>

@@ -1,11 +1,9 @@
 <main>
-  <section style="padding: 100px 0; min-height: 70vh;">
-    <div class="container" style="max-width: 560px;">
+  <section class="page-section">
+    <div class="container container-md">
       <div class="section-eyebrow">// Get Started</div>
       <h2 class="section-title">Create your <em>account.</em></h2>
-      <p class="section-lede" style="margin-bottom: 40px;">
-        Join your neighborhood watch community.
-      </p>
+      <p class="section-lede">Join your neighborhood watch community.</p>
 
       {{#if hasError}}
         <div class="form-error">{{error}}</div>
@@ -48,17 +46,17 @@
         <div class="form-divider">// Address</div>
 
         <div class="form-group">
-          <label class="form-label" for="street">Street</label>
+          <label class="form-label" for="Street">Street</label>
           <input class="form-input" type="text" id="Street" name="address[Street]" placeholder="123 Main St" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" for="city">City</label>
+            <label class="form-label" for="City">City</label>
             <input class="form-input" type="text" id="City" name="address[City]" placeholder="Springfield" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="state">State</label>
+            <label class="form-label" for="State">State</label>
             <select class="form-input form-select" id="State" name="address[State]" required>
               <option value="" disabled selected>State...</option>
               <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
@@ -89,17 +87,15 @@
           <label class="form-label" for="password">Password</label>
           <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required>
         </div>
-        <div class="form-group" style="margin-bottom: 32px;">
+        <div class="form-group form-group-last">
           <label class="form-label" for="confirmPassword">Confirm Password</label>
           <input class="form-input" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Create Account</button>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
       </form>
 
-      <p class="form-footer">
-        Already have an account? <a href="/signin">Sign in</a>
-      </p>
+      <p class="form-footer">Already have an account? <a href="/signin">Sign in</a></p>
     </div>
   </section>
 </main>

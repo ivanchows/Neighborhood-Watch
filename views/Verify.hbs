@@ -1,0 +1,23 @@
+<main>
+  <section class="page-section">
+    <div class="container container-sm">
+      <div class="section-eyebrow">// Admin</div>
+      <h2 class="section-title">Verify <em>incident.</em></h2>
+      <p class="section-lede">Reviewing: <strong class="text-normal">{{incident.Title}}</strong></p>
+
+      <form method="POST" action="/verify/{{incident._id}}">
+        <div class="form-group form-group-last">
+          <label class="form-label" for="verify">Verification Decision</label>
+          <select class="form-input form-select" id="verify" name="verify" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="yes">Yes — Verified</option>
+            <option value="no">No — Not Verified</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Submit</button>
+      </form>
+
+      <p class="form-footer"><a href="/incident_card/{{incident._id}}">Cancel</a></p>
+    </div>
+  </section>
+</main>

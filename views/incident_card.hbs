@@ -1,0 +1,49 @@
+<main>
+  <section class="page-section">
+    <div class="container container-lg">
+
+      <div class="section-eyebrow">// {{incident.category}}</div>
+      <h2 class="section-title">{{incident.Title}}</h2>
+
+      <div class="incident-badges">
+        <span class="badge-status badge-active">{{incident.status}}</span>
+        {{#if incident.verified}}
+          <span class="badge-verified">Verified: {{incident.verified}}</span>
+        {{/if}}
+      </div>
+
+      <div class="panel panel-spaced">
+        <div class="panel-header">
+          <span>Incident Details</span>
+          <span class="panel-date">{{incident.postedDate}}</span>
+        </div>
+        <div class="panel-body">
+          <p class="field-label">Location</p>
+          <p class="field-value">{{incident.location}}</p>
+          <p class="field-label">Description</p>
+          <p class="field-value-body">{{incident.description}}</p>
+          <p class="field-label">Reported By</p>
+          <p>{{incident.reportedBy}}</p>
+        </div>
+      </div>
+
+      {{#if isOwner}}
+        <div class="action-row">
+          <a href="/incident_update/{{incident._id}}" class="btn btn-ghost">Edit Report</a>
+          <form method="POST" action="/incident_card/{{incident._id}}" class="form-inline">
+            <button type="submit" class="btn btn-ghost btn-danger">Delete Report</button>
+          </form>
+        </div>
+      {{/if}}
+
+      {{#if isAdmin}}
+        <div class="action-row">
+          <a href="/verify/{{incident._id}}" class="btn btn-ghost">Verify</a>
+          <a href="/status/{{incident._id}}" class="btn btn-ghost">Update Status</a>
+        </div>
+      {{/if}}
+
+      <p class="form-footer"><a href="/incidents">Back to all incidents</a></p>
+    </div>
+  </section>
+</main>

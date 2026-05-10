@@ -1,0 +1,93 @@
+<main>
+  <section class="page-section">
+    <div class="container">
+      <div class="section-eyebrow">// Local Services</div>
+      <h2 class="section-title">Emergency services <em>near you.</em></h2>
+      <p class="section-lede">
+        Showing results for ZIP code <strong class="text-normal">{{zip}}</strong>. Enter a different ZIP to search another area.
+      </p>
+
+      <form method="GET" action="/services" class="services-search-form">
+        <div class="services-search-row">
+          <div class="form-group services-search-input">
+            <label class="form-label" for="zip">ZIP Code</label>
+            <input class="form-input" type="text" id="zip" name="zip" value="{{zip}}" pattern="\d{5}" maxlength="5" placeholder="07030" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+
+      {{#if hasError}}
+        <div class="form-error">{{error}}</div>
+      {{else}}
+        <div class="services-grid">
+
+          <div class="service-card">
+            <div class="service-card-header">
+              <span class="service-card-title">Police Departments</span>
+              <span class="service-badge">{{services.police.length}} found</span>
+            </div>
+            {{#each services.police}}
+              <div class="service-item">
+                <div class="service-name">{{name}}</div>
+                {{#if address}}<div class="service-detail">{{address}}</div>{{/if}}
+                {{#if phone}}<div class="service-detail"><a href="tel:{{phone}}" class="service-phone">{{phone}}</a></div>{{/if}}
+              </div>
+            {{else}}
+              <div class="service-empty">None found within 10km</div>
+            {{/each}}
+          </div>
+
+          <div class="service-card">
+            <div class="service-card-header">
+              <span class="service-card-title">Fire Departments</span>
+              <span class="service-badge">{{services.fire.length}} found</span>
+            </div>
+            {{#each services.fire}}
+              <div class="service-item">
+                <div class="service-name">{{name}}</div>
+                {{#if address}}<div class="service-detail">{{address}}</div>{{/if}}
+                {{#if phone}}<div class="service-detail"><a href="tel:{{phone}}" class="service-phone">{{phone}}</a></div>{{/if}}
+              </div>
+            {{else}}
+              <div class="service-empty">None found within 10km</div>
+            {{/each}}
+          </div>
+
+          <div class="service-card">
+            <div class="service-card-header">
+              <span class="service-card-title">Hospitals</span>
+              <span class="service-badge">{{services.hospital.length}} found</span>
+            </div>
+            {{#each services.hospital}}
+              <div class="service-item">
+                <div class="service-name">{{name}}</div>
+                {{#if address}}<div class="service-detail">{{address}}</div>{{/if}}
+                {{#if phone}}<div class="service-detail"><a href="tel:{{phone}}" class="service-phone">{{phone}}</a></div>{{/if}}
+              </div>
+            {{else}}
+              <div class="service-empty">None found within 10km</div>
+            {{/each}}
+          </div>
+
+          <div class="service-card">
+            <div class="service-card-header">
+              <span class="service-card-title">Urgent Care</span>
+              <span class="service-badge">{{services.urgentCare.length}} found</span>
+            </div>
+            {{#each services.urgentCare}}
+              <div class="service-item">
+                <div class="service-name">{{name}}</div>
+                {{#if address}}<div class="service-detail">{{address}}</div>{{/if}}
+                {{#if phone}}<div class="service-detail"><a href="tel:{{phone}}" class="service-phone">{{phone}}</a></div>{{/if}}
+              </div>
+            {{else}}
+              <div class="service-empty">None found within 10km</div>
+            {{/each}}
+          </div>
+
+        </div>
+      {{/if}}
+    </div>
+  </section>
+</main>

@@ -9,6 +9,8 @@
       <a href="/#features">Features</a>
       <a href="/#compare">Compare</a>
       <a href="/#about">About</a>
+      {{#if user}}<a href="/incidents">Incidents</a>{{/if}}
+      {{#if user}}<a href="/services">Local Services</a>{{/if}}
     </div>
     <div class="nav-actions">
       {{#if user}}

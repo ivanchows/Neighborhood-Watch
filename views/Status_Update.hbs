@@ -1,0 +1,24 @@
+<main>
+  <section class="page-section">
+    <div class="container container-sm">
+      <div class="section-eyebrow">// Admin</div>
+      <h2 class="section-title">Update <em>status.</em></h2>
+      <p class="section-lede">Reviewing: <strong class="text-normal">{{incident.Title}}</strong></p>
+
+      <form method="POST" action="/status/{{incident._id}}">
+        <div class="form-group form-group-last">
+          <label class="form-label" for="status">New Status</label>
+          <select class="form-input form-select" id="status" name="status" required>
+            <option value="" disabled selected>Select...</option>
+            <option value="active">Active</option>
+            <option value="resolved">Resolved</option>
+            <option value="authorities notified">Authorities Notified</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Update Status</button>
+      </form>
+
+      <p class="form-footer"><a href="/incident_card/{{incident._id}}">Cancel</a></p>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,42 @@
+<main>
+  <section class="page-section">
+    <div class="container">
+      <div class="section-eyebrow">// Community Feed</div>
+      <h2 class="section-title">Recent <em>incidents.</em></h2>
+      <p class="section-lede">Reports filed by your neighbors. Click any incident to view full details.</p>
+
+      <div class="incident-create-action">
+        <a href="/incident_create" class="btn btn-primary">+ File a Report</a>
+      </div>
+
+      {{#if incidents.length}}
+        <div class="panel">
+          <div class="panel-header">
+            <span>All Incidents</span>
+            <span>{{incidents.length}} reports</span>
+          </div>
+          <div class="feed-list">
+            {{#each incidents}}
+              <a href="/incident_card/{{_id}}" class="feed-link">
+                <div class="feed-item">
+                  <div class="feed-meta">
+                    <span class="badge badge-active">{{status}}</span>
+                    <span>{{postedDate}}</span>
+                    <span>{{category}}</span>
+                  </div>
+                  <div class="feed-title">{{Title}}</div>
+                  <div class="feed-loc">{{location}} &mdash; reported by {{reportedBy}}</div>
+                </div>
+              </a>
+            {{/each}}
+          </div>
+        </div>
+      {{else}}
+        <div class="panel panel-empty">
+          <p class="panel-empty-msg">No incidents reported yet. Be the first.</p>
+          <a href="/incident_create" class="btn btn-primary btn-mt">File a Report</a>
+        </div>
+      {{/if}}
+    </div>
+  </section>
+</main>

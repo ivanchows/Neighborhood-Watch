@@ -1,0 +1,49 @@
+<main>
+  <section class="page-section">
+    <div class="container container-md">
+      <div class="section-eyebrow">// New Report</div>
+      <h2 class="section-title">File an <em>incident.</em></h2>
+      <p class="section-lede">Describe what happened so your neighbors can stay informed.</p>
+
+      {{#if hasError}}
+        <div class="form-error">{{error}}</div>
+      {{/if}}
+
+      <form method="POST" action="/incident_create">
+        <div class="form-group">
+          <label class="form-label" for="category">Category</label>
+          <select class="form-input form-select" id="category" name="category" required>
+            <option value="" disabled selected>Select a category...</option>
+            <option value="Suspicious Activity">Suspicious Activity</option>
+            <option value="Theft">Theft</option>
+            <option value="Vandalism">Vandalism</option>
+            <option value="Traffic">Traffic</option>
+            <option value="Hazard">Hazard</option>
+            <option value="Animal">Animal</option>
+            <option value="Noise">Noise</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="Title">Title</label>
+          <input class="form-input" type="text" id="Title" name="Title" placeholder="Brief summary of the incident" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-input" id="description" name="description" rows="4" placeholder="Describe what happened in detail..." required></textarea>
+        </div>
+
+        <div class="form-group form-group-last">
+          <label class="form-label" for="location">Location</label>
+          <input class="form-input" type="text" id="location" name="location" placeholder="e.g. Washington St & 7th St" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Submit Report</button>
+      </form>
+
+      <p class="form-footer"><a href="/incidents">Back to incidents</a></p>
+    </div>
+  </section>
+</main>

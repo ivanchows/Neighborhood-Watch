@@ -1,11 +1,9 @@
 <main>
-  <section style="padding: 100px 0; min-height: 70vh;">
-    <div class="container" style="max-width: 480px;">
+  <section class="page-section">
+    <div class="container container-sm">
       <div class="section-eyebrow">// Welcome Back</div>
       <h2 class="section-title">Sign <em>in.</em></h2>
-      <p class="section-lede" style="margin-bottom: 40px;">
-        Access your neighborhood safety dashboard.
-      </p>
+      <p class="section-lede">Access your neighborhood safety dashboard.</p>
 
       {{#if hasError}}
         <div class="form-error">{{error}}</div>
@@ -16,16 +14,14 @@
           <label class="form-label" for="email">Email</label>
           <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required>
         </div>
-        <div class="form-group" style="margin-bottom: 32px;">
+        <div class="form-group form-group-last">
           <label class="form-label" for="password">Password</label>
           <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Sign In</button>
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
       </form>
 
-      <p class="form-footer">
-        Don't have an account? <a href="/register">Register</a>
-      </p>
+      <p class="form-footer">Don't have an account? <a href="/register">Register</a></p>
     </div>
   </section>
 </main>
