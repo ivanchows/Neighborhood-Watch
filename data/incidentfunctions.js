@@ -133,12 +133,12 @@ const createIncident = async(
                     text: 'Hello, a new incident has been created in your area. Ig attach incident_id here idk can edit message later'
                 };
                 await transporter.sendMail(mailOptions); 
+                console.log("Email Sent!");
             }
         }
     } catch(e){
-        console.log("Error: email failed to send");
+        console.log("Email failed:", e);
     }
-
     //update users created incidents field
     let updated_user = await user_collection.findOneAndUpdate({_id: new ObjectId(user_id)}, 
     {$push: {filedReports: insert_incident.insertedId}
