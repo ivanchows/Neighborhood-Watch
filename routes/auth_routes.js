@@ -20,6 +20,7 @@ import {
   getUserById,
   removeUser
 } from '../data/users.js';
+import { getAllIncidents } from '../data/incidentfunctions.js';
 
 const router = Router();
 
@@ -40,16 +41,48 @@ function cleanAddress(address) {
 }
 
 router.route('/').get(async (req, res) => {
+  let recentIncidents = [];
+  let mapIncidents = [];
+
+  try {
+    const incidents = await getAllIncidents();
+    recentIncidents = incidents
+      .map((incident) => ({
+        ...incident,
+        _id: incident._id.toString()
+      }))
+      .slice(-5)
+      .reverse();
+
+    mapIncidents = recentIncidents.map((incident) => ({
+      _id: incident._id,
+      title: incident.Title || incident.title || '',
+      loc: incident.location || incident.loc || '',
+      status: incident.status || 'active',
+      lat: incident.lat,
+      lng: incident.lng
+    }));
+  } catch (_) {
+    recentIncidents = [];
+    mapIncidents = [];
+  }
+
+  const homeData = {
+    title: 'Home',
+    recentIncidents,
+    mapIncidentsJSON: JSON.stringify(mapIncidents)
+  };
+
   if (!req.session.user) {
     res.render('home', {
-      title: 'Home',
+      ...homeData,
       notLoggedIn: true
     });
     return;
   }
 
   res.render('home', {
-    title: 'Home',
+    ...homeData,
     loggedIn: true,
     isAdmin: req.session.user.role === 'admin',
     user: req.session.user
