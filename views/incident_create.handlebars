@@ -4,7 +4,15 @@
 <form id="incident_create-form" name="incident_create-form" action="/incident_create" method="POST" class="form">
     <label>
         category
-        <input type="text" name="category" id="category" placeholder="Type the category">
+        <select name="category" id="category" class="full-width-input">
+            <option value="traffic">Traffic</option>
+            <option value="theft">Theft</option>
+            <option value="car accident">Car Accident</option>
+            <option value="animal">Animal</option>
+            <option value="debris">Debris</option>
+            <option value="suspicious activity">Suspicious Activity</option>
+            <option value="crime">Crime</option>
+        </select>
     </label>
     <label>
         Title
