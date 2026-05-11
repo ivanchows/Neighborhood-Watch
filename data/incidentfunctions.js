@@ -159,6 +159,9 @@ const createIncident = async(
         verified: "",
         status: status,
         likes: likes,
+        likedBy: likedBy,
+        lat: lat,
+        lng: lng,
         notifications: notifList,
         comments: commentList
   };
@@ -226,7 +229,10 @@ const verifyIncident = async(
         userId: incident.userId,
         verified: verify,
         status: incident.status,
-        likes: incident.likes || 0,
+        likes: incident.likes,
+        likedBy: likedBy,
+        lat: lat,
+        lng: lng,
         notifications: incident.notifications,
         comments: incident.comments
     };
@@ -236,9 +242,16 @@ const verifyIncident = async(
         throw "Error: incident could not be verified";
     }
     const user_collection = await users();
+    let user = await user_collection.findOne({_id: new ObjectId(updated.userId)});
+    let num_incidents = user.filedReports.length;
+    let num_verified = user.verifiedReports.length;
+    let trust_rating = (num_verified/num_incidents) * 10;
     let updated_user = await user_collection.findOneAndUpdate({_id: new ObjectId(updated.userId)}, 
-    {$push: {verifiedReports: updated._id}
-    })
+    {$push: {verifiedReports: updated._id, trustRating: trust_rating}
+    });
+    if (!updated_user){
+        throw "Error: could not update user";
+    }
     if (!updated_user){
         throw "Error: could not update user";
     }
@@ -289,7 +302,10 @@ const updateStatus = async(
         userId: incident.userId,
         verified: incident.verified,
         status: status,
-        likes: incident.likes || 0,
+        likes: incident.likes,
+        likedBy: likedBy,
+        lat: lat,
+        lng: lng,
         notifications: incident.notifications,
         comments: incident.comments
     };
@@ -359,7 +375,10 @@ const updateIncident = async(
         userId: og_incident.userId,
         verified: og_incident.verified,
         status: og_incident.status,
-        likes: og_incident.likes || 0,
+        likes: og_incident.likes,
+        likedBy: likedBy,
+        lat: lat,
+        lng: lng,
         notifications: og_incident.notifications,
         comments: og_incident.comments
     };
