@@ -1,4 +1,5 @@
-import { users } from './config/mongoCollections.js';
+import { users } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 const saltRounds = 16;
 
@@ -198,7 +199,7 @@ export async function createUser(firstName, lastName, email, gender, age, addres
         address: address,
         hashedPassword: hashedPassword,
         role: "user",
-        trustRating: 2.5,
+        trustRating: 5,
         filedReports: [],
         verifiedReports: [],
         watchListZip: [address.zipCode],
@@ -224,6 +225,8 @@ export async function authenticateUser(email, password) {
     const user = await userCollection.findOne({ email: email });
     if (!user) throw `Either the email or password is invalid.`;
 
+    if(user.role == "banned") throw 'Your account has been banned'
+
     let compareMatch = false;
 
     try {
@@ -235,7 +238,7 @@ export async function authenticateUser(email, password) {
     if (!compareMatch) throw `Either the email or password is invalid.`;
 
     return {
-        _id: user._id,
+        _id: user._id.toString(),
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
@@ -249,4 +252,288 @@ export async function authenticateUser(email, password) {
         watchListZip: user.watchListZip,
         accountMade: user.accountMade
     };
+}
+
+export async function removeUser(userId) {
+    if (userId === undefined) {
+        throw `You must supply exactly 1 argument.`;
+    }
+
+    userId = checkString(userId, "userId");
+
+    if (!ObjectId.isValid(userId)) {
+        throw `userId is not a valid ObjectId.`;
+    }
+
+    const userCollection = await users();
+
+    const currentUser = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    if (!currentUser) {
+        throw `User not found.`;
+    }
+
+    const deletionInfo = await userCollection.deleteOne({
+        _id: new ObjectId(userId)
+    });
+
+    if (deletionInfo.deletedCount === 0) {
+        throw `Could not remove user.`;
+    }
+
+    return {
+        userRemoved: true
+    };
+}
+
+export async function updateProfile(userId, firstName, lastName, email, gender, age, address) {
+    if (userId === undefined || firstName === undefined || lastName === undefined || email === undefined || gender === undefined || age === undefined || address === undefined) {
+        throw `You must supply exactly 7 arguments.`;
+    }
+
+    userId = checkString(userId, "userId");
+
+    if (!ObjectId.isValid(userId)) {
+        throw `userId is not a valid ObjectId.`;
+    }
+
+    firstName = checkName(firstName, "firstName");
+    lastName = checkName(lastName, "lastName");
+    email = checkEmail(email);
+    gender = checkGender(gender);
+    age = checkAge(age);
+    address = checkAddress(address);
+
+    const userCollection = await users();
+
+    const currentUser = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    if (!currentUser) {
+        throw `User not found.`;
+    }
+
+    const existingEmailUser = await userCollection.findOne({
+        email: email
+    });
+
+    if (existingEmailUser && existingEmailUser._id.toString() !== userId) {
+        throw `There is already a user with that email.`;
+    }
+
+    let updatedUser = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        gender: gender,
+        age: age,
+        address: address,
+        watchListZip: [address.zipCode]
+    };
+
+    const updateInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: updatedUser }
+    );
+
+    if (updateInfo.matchedCount === 0) {
+        throw `Could not update user.`;
+    }
+    const user = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    return {
+        _id: user._id.toString(),
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        gender: user.gender,
+        age: user.age,
+        address: user.address,
+        role: user.role,
+        trustRating: user.trustRating,
+        filedReports: user.filedReports,
+        verifiedReports: user.verifiedReports,
+        watchListZip: user.watchListZip,
+        accountMade: user.accountMade
+    };
+}
+
+export async function addZipToWatchList(userId, zipCode) {
+    if (userId === undefined || zipCode === undefined) {
+        throw `You must supply exactly 2 arguments.`;
+    }
+
+    userId = checkString(userId, "userId");
+
+    if (!ObjectId.isValid(userId)) {
+        throw `userId is not a valid ObjectId.`;
+    }
+
+    zipCode = checkZipCode(zipCode);
+
+    const userCollection = await users();
+
+    const currentUser = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    if (!currentUser) {
+        throw `User not found.`;
+    }
+
+    if (currentUser.watchListZip && currentUser.watchListZip.includes(zipCode)) {
+        throw `That zip code is already in your watch list.`;
+    }
+
+    const updateInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $addToSet: { watchListZip: zipCode } }
+    );
+
+    if (updateInfo.matchedCount === 0) {
+        throw `Could not update watch list.`;
+    }
+
+    const updatedUser = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    return {
+        _id: updatedUser._id.toString(),
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        gender: updatedUser.gender,
+        age: updatedUser.age,
+        address: updatedUser.address,
+        role: updatedUser.role,
+        trustRating: updatedUser.trustRating,
+        filedReports: updatedUser.filedReports,
+        verifiedReports: updatedUser.verifiedReports,
+        watchListZip: updatedUser.watchListZip,
+        accountMade: updatedUser.accountMade
+    };
+}
+
+export async function getAllUsers() {
+    const userCollection = await users();
+
+    const allUsers = await userCollection.find({}).toArray();
+
+    let userList = [];
+
+    for (let i = 0; i < allUsers.length; i++) {
+        userList.push([
+            allUsers[i].firstName + " " + allUsers[i].lastName,
+            allUsers[i]._id.toString()
+        ]);
+    }
+
+    return userList;
+}
+
+export async function getUserById(userId) {
+    if (userId === undefined) throw `You must supply exactly 1 argument.`;
+
+    userId = checkString(userId, "userId");
+
+    if (!ObjectId.isValid(userId)) throw `userId is not a valid ObjectId.`;
+
+    const userCollection = await users();
+
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (!user) throw `User not found.`;
+
+    return {
+        _id: user._id.toString(),
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        gender: user.gender,
+        age: user.age,
+        address: user.address,
+        role: user.role,
+        trustRating: user.trustRating,
+        watchListZip: user.watchListZip,
+        accountMade: user.accountMade
+    };
+}
+
+export async function adminUser(userId) {
+    if (userId === undefined) {
+        throw `You must supply exactly 1 argument.`;
+    }
+
+    userId = checkString(userId, "userId");
+
+    if (!ObjectId.isValid(userId)) {
+        throw `userId is not a valid ObjectId.`;
+    }
+
+    const userCollection = await users();
+
+    const currentUser = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    if (!currentUser) {
+        throw `User not found.`;
+    }
+
+    if (currentUser.role === "admin") {
+        throw `User is already an admin.`;
+    }
+
+    const updateInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { role: "admin" } }
+    );
+
+    if (updateInfo.matchedCount === 0) {
+        throw `Could not upgrade user to admin.`;
+    }
+
+    return { adminUpdated: true };
+}
+
+export async function banUser(userId) {
+    if (userId === undefined) {
+        throw `You must supply exactly 1 argument.`;
+    }
+
+    userId = checkString(userId, "userId");
+
+    if (!ObjectId.isValid(userId)) {
+        throw `userId is not a valid ObjectId.`;
+    }
+
+    const userCollection = await users();
+
+    const currentUser = await userCollection.findOne({
+        _id: new ObjectId(userId)
+    });
+
+    if (!currentUser) {
+        throw `User not found.`;
+    }
+
+    if (currentUser.role === "banned") {
+        throw `User is already banned.`;
+    }
+
+    const updateInfo = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { role: "banned" } }
+    );
+
+    if (updateInfo.matchedCount === 0) {
+        throw `Could not ban user.`;
+    }
+
+    return { userBanned: true };
 }
