@@ -245,7 +245,7 @@ router
     });
 
 router
-    .route('/status/:id')
+    .route('/status_update/:id')
     .get(requireLogin, async (req, res) =>{
         try{
             const incident = await getOneIncident(req.params.id);
