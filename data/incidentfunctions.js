@@ -165,6 +165,7 @@ const createIncident = async(
   return result;
 }
 
+
 const getAllIncidents = async() => {
     let result = [];
     const incident_collection = await incidents();
@@ -235,7 +236,7 @@ const verifyIncident = async(
         throw "Error: incident could not be verified";
     }
     const user_collection = await users();
-    let updated_user = await user_collection.findOneAndUpdate({_id: new ObjectId(user_id)}, 
+    let updated_user = await user_collection.findOneAndUpdate({_id: new ObjectId(updated.userId)}, 
     {$push: {verifiedReports: updated._id}
     })
     if (!updated_user){
