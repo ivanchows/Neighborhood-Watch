@@ -446,7 +446,7 @@ const createNotif = async(
         throw "Error: failed to update incident";
     }
     //grab user collection to send emails:
-    try{
+     try{
         let user_collection = await users();
         let emailed_users = await user_collection.find({location: update_incident.location}).toArray();
         let emailed_users_length = emailed_users.length;
@@ -461,10 +461,11 @@ const createNotif = async(
                     text: 'Hello, a new incident has been created in your area. Ig attach incident_id here idk can edit message later'
                 };
                 await transporter.sendMail(mailOptions); 
+                console.log("Email sent!");
             }
         }
     } catch(e){
-        console.log("Error: email failed to send");
+        console.log("Email failed:", e);
     }
     let message = "Successfully created notification!";
     return message;
