@@ -21,21 +21,67 @@ npm run dev
 
 ```
 sentry/
-├── app.js                       Express server + routes
+├── app.js
 ├── package.json
+├── README.md
+├── .gitignore
+│
+├── config/
+│   ├── mongoCollections.js
+│   ├── mongoConnection.js
+│   └── settings.js
+│
+├── data/
+│   ├── errorchecking.js
+│   ├── incidentfunctions.js
+│   ├── services.js
+│   └── users.js
+│
+├── public/
+│   ├── css/
+│   │   └── styles.css
+│   │
+│   ├── js/
+│   │   ├── form_validate.js
+│   │   ├── form_validation.js
+│   │   ├── home.js
+│   │   └── local_services.js
+│   │
+│   └── images/
+│
+├── routes/
+│   ├── auth_routes.js
+│   ├── incident_routes.js
+│   ├── service_routes.js
+│   └── index.js
+│
 ├── views/
 │   ├── layouts/
-│   │   └── main.hbs             Base layout (head, nav, footer, body slot)
+│   │   └── main
+│   │
 │   ├── partials/
-│   │   ├── nav.hbs              Top navigation
-│   │   ├── footer.hbs
-│   │   └── incident-modal.hbs   Click-a-pin modal (used on home)
-│   ├── home.hbs                 Landing page
-│   ├── register.hbs             ← Replace with your registration form
-│   └── login.hbs                ← Replace with your sign-in form
-└── public/
-    ├── css/styles.css           All styles
-    └── js/home.js               Modal click handlers for home page
+│   │   ├── incident-modal
+│   │   ├── nav
+│   │   └── nav
+│   │
+│   ├── main
+│   ├── Deletion
+│   ├── Status_Update
+│   ├── Verify
+│   ├── adminUserProfile
+│   ├── adminUsers
+│   ├── error
+│   ├── home
+│   ├── incident_card
+│   ├── incident_create
+│   ├── incident_update
+│   ├── incidents
+│   ├── local_services
+│   ├── profile
+│   ├── register
+│   ├── services
+│   ├── signin
+│   └── signout
 ```
 
 ## Adding a new page
