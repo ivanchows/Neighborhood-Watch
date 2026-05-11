@@ -86,8 +86,50 @@ router
 router
     .route('/incident_card/:id')
     .get(requireLogin, async (req, res) => {
+        let incident_data = req.body;
+        if (!incident_data){
+            return res.status(400).render('error', {title: "error", error: e, error_class: "error"});
+        }
         try{
             req.params.id = id_checker(req.params.id);
+            incident_data.category = string_checker(cleanInput(incident_data.category));
+            if (incident_data.category.length > 100){
+                throw "Error: category cannot be longer than 100 characters";
+            }
+            let image = "../images/default.jpg";
+            if(incident_data.category.toLocaleLowerCase() === "traffic"){
+                image = "../images/traffic.jpg";
+            }
+            if(incident_data.category.toLocaleLowerCase() === "theft"){
+                image = "../images/theft.jpg";
+            }
+            if(incident_data.category.toLocaleLowerCase() === "animal"){
+                image = "../images/animal.jpg";
+            }
+            if(incident_data.category.toLocaleLowerCase() === "crime"){
+                image = "../images/crime.jpg";
+            }
+            if(incident_data.category.toLocaleLowerCase() === "car accident"){
+                image = "../images/car accident.jpg";
+            }
+            if(incident_data.category.toLocaleLowerCase() === "suspicious activity"){
+                image = "../images/suspicious activity.jpg";
+            }
+            if(incident_data.category.toLocaleLowerCase() === "debris"){
+                image = "../images/debris.jpg";
+            }
+            incident_data.Title = string_checker(cleanInput(incident_data.Title));
+            if (incident_data.Title.length > 100){
+                throw "Error: title cannot be longer than 100 characters";
+            }
+            incident_data.description = string_checker(cleanInput(incident_data.description));
+            if (incident_data.description.length > 500){
+                throw "Error: description cannot be longer than 500 characters";
+            }
+            incident_data.location = string_checker(cleanInput(incident_data.location));
+            if (incident_data.location.length > 100){
+                throw "Error: location cannot be longer than 100 characters";
+            }
         } catch(e){
             return res.status(400).render('error', {title: "error", error: e});
         }
@@ -104,7 +146,7 @@ router
                 admin = true;
             }
             const hasLiked = (incident.likedBy || []).includes(req.session.user._id.toString());
-            return res.render('incident_card', {title: "Incident Card", incident: incident, admin: admin, user: correct_user, hasLiked: hasLiked});
+            return res.render('incident_card', {title: "Incident Card", incident: incident, admin: admin, user: correct_user, hasLiked: hasLiked, image: image});
         } catch(e){
             return res.status(404).render('error', {title: "error", error: e});
         }
