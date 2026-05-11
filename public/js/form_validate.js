@@ -177,6 +177,7 @@ if (signupForm) {
   signupForm.addEventListener('submit', (event) => {
     try {
       removeExistingErrors();
+      document.getElementById('submit').disabled = false;
 
       let firstName = document.getElementById('firstName').value;
       let lastName = document.getElementById('lastName').value;
