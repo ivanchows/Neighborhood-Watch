@@ -57,31 +57,27 @@ sentry/
 │
 ├── views/
 │   ├── layouts/
-│   │   └── main
+│   │   └── main.handlebars
 │   │
 │   ├── partials/
-│   │   ├── incident-modal
-│   │   ├── nav
-│   │   └── nav
+│   │   └── nav.handlebars
 │   │
-│   ├── main
-│   ├── Deletion
-│   ├── Status_Update
-│   ├── Verify
-│   ├── adminUserProfile
-│   ├── adminUsers
-│   ├── error
-│   ├── home
-│   ├── incident_card
-│   ├── incident_create
-│   ├── incident_update
-│   ├── incidents
-│   ├── local_services
-│   ├── profile
-│   ├── register
-│   ├── services
-│   ├── signin
-│   └── signout
+│   ├── Deletion.handlebars
+│   ├── Status_Update.handlebars
+│   ├── Verify.handlebars
+│   ├── adminUserProfile.handlebars
+│   ├── adminUsers.handlebars
+│   ├── error.handlebars
+│   ├── home.handlebars
+│   ├── incident_card.handlebars
+│   ├── incident_create.handlebars
+│   ├── incident_update.handlebars
+│   ├── incidents.handlebars
+│   ├── profile.handlebars
+│   ├── register.handlebars
+│   ├── services.handlebars
+│   ├── signin.handlebars
+│   └── signout.handlebars
 ```
 
 ## Adding a new page
