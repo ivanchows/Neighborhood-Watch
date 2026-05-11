@@ -4,7 +4,15 @@
 <form id="incident_update-form" name="incident_update-form" action="/incident_update" method="POST" class="form">
     <label>
         category
-        <input type="text" name="category" id="category" placeholder="Type the category or leave blank if you dont want to change">
+        <select name="category" id="category" class="full-width-input">
+            <option value="traffic">Traffic</option>
+            <option value="theft">Theft</option>
+            <option value="car accident">Car Accident</option>
+            <option value="animal">Animal</option>
+            <option value="debris">Debris</option>
+            <option value="suspicious activity">Suspicious Activity</option>
+            <option value="crime">Crime</option>
+        </select>
     </label>
     <label>
         Title
@@ -22,5 +30,4 @@
         submit button 
         <button type="submit" name="submit_button" id="submit_button">Submit!</button>
     </label>
-    {{! Write code to handle sending the users name and id}}
 </form>
