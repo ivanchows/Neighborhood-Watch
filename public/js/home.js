@@ -1,4 +1,4 @@
-const serverIncidents = window.__mapIncidents || [];
+const serverIncidents = Array.isArray(window.__mapIncidents) ? window.__mapIncidents : [];
 
 // Static fallback coordinates keyed by title (used when DB incidents lack lat/lng)
 const staticCoords = {
@@ -50,6 +50,8 @@ if (mapEl && typeof L !== 'undefined') {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
   }).addTo(map);
 
+  setTimeout(() => map.invalidateSize(), 0);
+
   function markerColor(status) {
     const s = (status || '').toLowerCase();
     if (s === 'resolved') return '#22c55e';
@@ -57,13 +59,35 @@ if (mapEl && typeof L !== 'undefined') {
     return '#4169e1';
   }
 
-  // Build map pins from server incidents (with lat/lng) or static coords fallback
-  const mapData = serverIncidents.length > 0
-    ? serverIncidents
-    : staticFeed.map(s => ({ ...s, _id: null, ...staticCoords[s.title] }));
+  function normalizeIncident(inc) {
+    const title = inc.title || inc.Title || '';
+    const loc = inc.loc || inc.location || '';
+    const fallback = staticCoords[title] || null;
+    const lat = Number.parseFloat(inc.lat ?? inc.latitude ?? (fallback && fallback.lat));
+    const lng = Number.parseFloat(inc.lng ?? inc.lon ?? inc.longitude ?? (fallback && fallback.lng));
+
+    return {
+      _id: inc._id || null,
+      title,
+      loc,
+      status: inc.status || 'active',
+      lat,
+      lng
+    };
+  }
+
+  function hasCoords(inc) {
+    return Number.isFinite(inc.lat) && Number.isFinite(inc.lng);
+  }
+
+  // Build map pins from server incidents, filling known demo coordinates when DB rows lack lat/lng.
+  const normalizedServerIncidents = serverIncidents.map(normalizeIncident);
+  const mapData = normalizedServerIncidents.some(hasCoords)
+    ? normalizedServerIncidents
+    : staticFeed.map(s => normalizeIncident({ ...s, _id: null }));
 
   const markers = mapData.map(inc => {
-    if (!inc.lat || !inc.lng) return null;
+    if (!hasCoords(inc)) return null;
 
     const marker = L.circleMarker([inc.lat, inc.lng], {
       radius: 9,
@@ -88,10 +112,11 @@ if (mapEl && typeof L !== 'undefined') {
     );
 
     return marker;
-  }).filter(Boolean);
+  });
 
-  if (mapData.some(i => i.lat && i.lng)) {
-    const bounds = L.latLngBounds(mapData.filter(i => i.lat && i.lng).map(i => [i.lat, i.lng]));
+  const mappedIncidents = mapData.filter(hasCoords);
+  if (mappedIncidents.length > 0) {
+    const bounds = L.latLngBounds(mappedIncidents.map(i => [i.lat, i.lng]));
     map.fitBounds(bounds, { padding: [44, 44], maxZoom: 15 });
   }
 
