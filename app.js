@@ -32,8 +32,8 @@ const hbsConfig = {
     }
   }
 };
-app.engine('hbs', engine({ ...hbsConfig, extname: '.hbs' }));
-app.set('view engine', 'hbs');
+app.engine('handlebars', engine({ ...hbsConfig, extname: '.handlebars' }));
+app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
 
 // Static assets
